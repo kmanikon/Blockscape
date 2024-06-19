@@ -22,7 +22,7 @@ function App() {
     camera = Camera.camera;
     renderer = new THREE.WebGLRenderer();
     scene.background = new THREE.Color(0x777777);
-    camera.position.z = 5;
+    //camera.position.z = 5;
 
     renderer.setSize(window.innerWidth, window.innerHeight);
     if (refContainer.current) {
