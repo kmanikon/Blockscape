@@ -30,9 +30,27 @@ function App() {
     }
 
     const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x0afdcd });
+    //const material = new THREE.MeshBasicMaterial({ color: 0x0afdcd });
+    const material = new THREE.MeshLambertMaterial();
     mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
+
+    setupLights();
+
+    function setupLights() {
+      const lights = [
+        new THREE.AmbientLight(0xffffff, 0.2),
+        new THREE.DirectionalLight(0xffffff, 0.3),
+        new THREE.DirectionalLight(0xffffff, 0.3),
+        new THREE.DirectionalLight(0xffffff, 0.3)
+      ];
+
+      lights[1].position.set(0, 1, 0);
+      lights[2].position.set(1, 1, 0);
+      lights[3].position.set(0, 1, 1);
+
+      scene.add(...lights);
+    }
 
     const animate = () => {
       requestAnimationFrame(animate);
@@ -66,7 +84,7 @@ function App() {
 
   return (
     <div>
-      <div id="render-target" ref={refContainer} style={{ width: '100vw', height: '97vh' }}></div>
+      <div id="render-target" ref={refContainer} style={{ width: '100vw', height: '90vh' }}></div>
     </div>
   );
 }
