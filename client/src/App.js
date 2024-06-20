@@ -20,7 +20,18 @@ function App() {
 
   return (
     <div>
-      <div id="render-target" ref={refContainer} style={{ width: '100vw', height: '100vh' }}></div>
+      <div id="render-target" ref={refContainer} style={{ width: 'calc(100vw)', height: '100vh', float: 'right', zIndex: -1 }}>
+        
+
+        
+
+      </div>
+      <div id="ui-toolbar">
+          <button class="ui-button" onclick="setActiveTool(event,'residential')">RESIDENTIAL</button>
+          <button class="ui-button" onclick="setActiveTool(event,'commercial')">COMMERCIAL</button>
+          <button class="ui-button" onclick="setActiveTool(event,'industrial')">INDUSTRIAL</button>
+          <button class="ui-button" onclick="setActiveTool(event,'road')">ROAD</button>
+        </div>
     </div>
   );
 }
