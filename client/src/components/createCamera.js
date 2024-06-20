@@ -23,7 +23,7 @@ export function createCamera() {
   //const camera = new THREE.PerspectiveCamera(75, 100 / 100, 0.2, 1000);
   var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   //const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  let cameraOrigin = new THREE.Vector3();
+  let cameraOrigin = new THREE.Vector3(8, 0, 8);
   let cameraRadius = (MIN_CAMERA_RADIUS + MAX_CAMERA_RADIUS) / 2;  
   let cameraAzimuth = 135;
   let cameraElevation = 45;
