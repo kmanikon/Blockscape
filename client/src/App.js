@@ -9,13 +9,18 @@ function App() {
 
   let game;
   useEffect(() => {
+    if (refContainer.current) {
+      while (refContainer.current.firstChild) {
+        refContainer.current.removeChild(refContainer.current.firstChild);
+      }
+    }
     window.game = createGame();
 
   }, []);
 
   return (
     <div>
-      <div id="render-target" ref={refContainer} style={{ width: '100vw', height: '90vh' }}></div>
+      <div id="render-target" ref={refContainer} style={{ width: '100vw', height: '100vh' }}></div>
     </div>
   );
 }
