@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 
-export function createCamera() {
-
-
-  
+export function createCamera(gameWindow) {
   const DEG2RAD = Math.PI / 180.0;
 
   const LEFT_MOUSE_BUTTON = 0;
@@ -20,9 +17,7 @@ export function createCamera() {
 
   const Y_AXIS = new THREE.Vector3(0, 1, 0);
 
-  //const camera = new THREE.PerspectiveCamera(75, 100 / 100, 0.2, 1000);
-  var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  //const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const camera = new THREE.PerspectiveCamera(45, gameWindow.offsetWidth / gameWindow.offsetHeight, 0.1, 1000);
   let cameraOrigin = new THREE.Vector3(8, 0, 8);
   let cameraRadius = (MIN_CAMERA_RADIUS + MAX_CAMERA_RADIUS) / 2;  
   let cameraAzimuth = 135;
@@ -32,15 +27,9 @@ export function createCamera() {
   let isMiddleMouseDown = false;
   let prevMouseX = 0;
   let prevMouseY = 0;
-
-  const ZOOM_FOV_SENSITIVITY = 0.1;
   updateCameraPosition();
 
-
-
   function onMouseDown(event) {
-    console.log('mousedown');
-
     if (event.button === LEFT_MOUSE_BUTTON) {
       isLeftMouseDown = true;
     }
@@ -53,8 +42,6 @@ export function createCamera() {
   }
 
   function onMouseUp(event) {
-    console.log('mouseup');
-
     if (event.button === LEFT_MOUSE_BUTTON) {
       isLeftMouseDown = false;
     }
@@ -67,8 +54,6 @@ export function createCamera() {
   }
 
   function onMouseMove(event) {
-    console.log('mousemove');
-
     const deltaX = (event.clientX - prevMouseX);
     const deltaY = (event.clientY - prevMouseY);
 
@@ -100,13 +85,6 @@ export function createCamera() {
     prevMouseY = event.clientY;
   }
 
-  const onMouseWheel = (event) => {
-    camera.fov += event.deltaY * ZOOM_FOV_SENSITIVITY;
-    camera.fov = Math.min(100, Math.max(20, camera.fov)); // Limits FOV to a reasonable range
-    camera.updateProjectionMatrix();
-  };
-  
-
   function updateCameraPosition() {
     camera.position.x = cameraRadius * Math.sin(cameraAzimuth * DEG2RAD) * Math.cos(cameraElevation * DEG2RAD);
     camera.position.y = cameraRadius * Math.sin(cameraElevation * DEG2RAD);
@@ -120,7 +98,6 @@ export function createCamera() {
     camera,
     onMouseDown,
     onMouseUp,
-    onMouseMove,
-    onMouseWheel
+    onMouseMove
   }
 }
