@@ -31,11 +31,11 @@ function App() {
         </div>
       
         <div id="ui-toolbar">
-            <button id='button-bulldoze' class="ui-button selected" onClick={() => setActiveToolId('bulldoze') }>BULLDOZE</button>
-            <button id='button-residential' class="ui-button" onClick={() => setActiveToolId('residential') }>RESIDENTIAL</button>
-            <button id='button-commercial' class="ui-button" onClick={() => setActiveToolId('commercial')}>COMMERCIAL</button>
-            <button id='button-industrial' class="ui-button" onClick={() => setActiveToolId('industrial')}>INDUSTRIAL</button>
-            <button id='button-road' class="ui-button" onClick={() => setActiveToolId('road')}>ROAD</button>
+            <button id='button-bulldoze' className="ui-button selected" onClick={() => setActiveToolId('bulldoze') }>CLEAR</button>
+            <button id='button-residential' className="ui-button" onClick={() => setActiveToolId('residential') }>GREEN</button>
+            <button id='button-commercial' className="ui-button" onClick={() => setActiveToolId('commercial')}>BLUE</button>
+            <button id='button-industrial' className="ui-button" onClick={() => setActiveToolId('industrial')}>YELLOW</button>
+            <button id='button-road' className="ui-button" onClick={() => setActiveToolId('road')}>TILE</button>
         </div>
     </div>
   );

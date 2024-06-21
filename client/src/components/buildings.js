@@ -5,12 +5,7 @@ export default {
         height: 1,
         updated: true,
         update: function() {
-          if (Math.random() < 0.05) {
-            if (this.height < 5) {
-              this.height += 1;
-              this.updated = true;
-            }
-          }
+            this.updated = false;
         }
       }
     },
@@ -20,12 +15,7 @@ export default {
         height: 1,
         updated: true,
         update: function() {
-          if (Math.random() < 0.05) {
-            if (this.height < 5) {
-              this.height += 1;
-              this.updated = true;
-            }
-          }
+            this.updated = false;
         }
       }
     },
@@ -35,12 +25,7 @@ export default {
         height: 1,
         updated: true,
         update: function() {
-          if (Math.random() < 0.05) {
-            if (this.height < 5) {
-              this.height += 1;
-              this.updated = true;
-            }
-          }
+            this.updated = false;
         }
       }
     },

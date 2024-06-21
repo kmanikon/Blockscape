@@ -9,7 +9,7 @@ import buildingFactory from './buildings.js';
  * @returns a Game object
  */
 
-let activeToolId = '';
+let activeToolId = 'bulldoze';
 
 const setActiveToolId = (toolId) => {
     activeToolId = toolId;
@@ -49,10 +49,12 @@ export function createGame() {
     }
   }
 
+  /*
   // Start update interval
   setInterval(() => {
     game.update();
   }, 1000)
+  */
 
   scene.start();
 
