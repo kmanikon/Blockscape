@@ -13,7 +13,8 @@ let activeToolId = 'bulldoze';
 
 const setActiveToolId = (toolId) => {
     activeToolId = toolId;
-    console.log(toolId);
+    //console.log(toolId);
+    alert(toolId);
 }
 
 export function createGame() {
@@ -24,9 +25,11 @@ export function createGame() {
   scene.initialize(city);
 
   scene.onObjectSelected = (selectedObject) => {
-    let { x, y } = selectedObject.userData;
-    const tile = city.data[x][y];
+    let { x, y, z } = selectedObject.userData;
+    
+    const tile = city.data[x][y][z];
 
+    
     if (activeToolId === 'bulldoze') {
       tile.building = undefined;
       scene.update(city);
@@ -61,4 +64,4 @@ export function createGame() {
   return game;
 }
 
-export { setActiveToolId };
+export { activeToolId, setActiveToolId };
