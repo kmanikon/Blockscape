@@ -29,14 +29,19 @@ export function createGame() {
     
     const tile = city.data[x][y][z];
 
+    console.log(tile)
+    /*
+    //if (x >= 0 && x < city.size && y > 0 && y < city.size && z >= 0 && z < city.size) {
     
-    if (activeToolId === 'bulldoze') {
-      tile.building = undefined;
-      scene.update(city);
-    } else if (!tile.building) {
-      tile.building = buildingFactory[activeToolId]();
-      scene.update(city);
-    }
+      if (activeToolId === 'bulldoze') {
+        tile.building = undefined;
+        scene.update(city);
+      } else if (!tile.building) {
+        tile.building = buildingFactory[activeToolId]();
+        scene.update(city);
+      }
+    //}
+    */
   }
 
   // Hook up mouse event handlers to the scene
