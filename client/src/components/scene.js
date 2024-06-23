@@ -226,22 +226,6 @@ export function createScene() {
       if (selectedObject) selectedObject.material.emissive.setHex(0);
       selectedObject = intersections[0].object;
       selectedObject.material.emissive.setHex(0x555555);
-      console.log(selectedObject.userData);
-
-      /*
-      if (activeToolId !== 'bulldoze') {
-        placeBlock(intersections[0]);
-      }
-      else {
-        clearBlock(intersections[0]);
-      }
-      */
-
-      /*
-      if (onObjectSelected) {
-        onObjectSelected(selectedObject);
-      }
-      */
     }
   }
 
