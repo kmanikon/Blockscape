@@ -23,6 +23,8 @@ export function createScene() {
   let terrain = [];
   let highlightedBlocks = [];
 
+  let intersections = [];
+
   let onObjectSelected = undefined;
 
   function initialize(city) {
@@ -200,12 +202,25 @@ export function createScene() {
   }
 
   function onMouseDown(event) {
+    if (intersections.length > 0) {
+      if (activeToolId !== 'bulldoze') {
+        placeBlock(intersections[0]);
+      }
+      else {
+        clearBlock(intersections[0]);
+      }
+    }
+  }
+
+  function onMouseMove(event) {
+    camera.onMouseMove(event);
+
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
     mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera.camera);
 
-    let intersections = raycaster.intersectObjects(scene.children, false);
+    intersections = raycaster.intersectObjects(scene.children, false);
 
     if (intersections.length > 0) {
       if (selectedObject) selectedObject.material.emissive.setHex(0);
@@ -213,21 +228,21 @@ export function createScene() {
       selectedObject.material.emissive.setHex(0x555555);
       console.log(selectedObject.userData);
 
+      /*
       if (activeToolId !== 'bulldoze') {
         placeBlock(intersections[0]);
       }
       else {
         clearBlock(intersections[0]);
       }
+      */
 
+      /*
       if (onObjectSelected) {
         onObjectSelected(selectedObject);
       }
+      */
     }
-  }
-
-  function onMouseMove(event) {
-    camera.onMouseMove(event);
   }
 
   return {
