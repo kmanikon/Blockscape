@@ -53,6 +53,15 @@ export function createScene() {
       }
     }
 
+    for (let x = 0; x < city.size; x++) {
+      for (let y = 0; y < city.size; y++) {
+        const terrainId = 'sky';
+        const mesh = createAssetInstance(terrainId, x, 1, y);
+        scene.add(mesh);
+        terrain[x][1][y] = mesh;
+      }
+    }
+
     setupLights();
   }
 
@@ -149,8 +158,13 @@ export function createScene() {
 
     if (x >= 0 && x < terrain.length &&
       y >= 0 && y < terrain[0].length &&
-      z >= 0 && z < terrain[0][0].length && 
-      isPlaceable(x, y, z)) {
+      z >= 0 && z < terrain[0][0].length) {
+        //alert('hi')
+
+      if (terrain[x][y][z] !== undefined) {
+        scene.remove(terrain[x][y][z]);
+        terrain[x][y][z] = undefined;
+      }
       const newBlock = createAssetInstance(activeToolId, x, y, z);
       scene.add(newBlock);
       terrain[x][y][z] = newBlock;
@@ -205,6 +219,7 @@ export function createScene() {
     if (intersections.length > 0) {
       if (activeToolId !== 'bulldoze') {
         placeBlock(intersections[0]);
+        alert(`Placed Block at [${selectedObject?.userData?.x}, ${selectedObject?.userData?.y}, ${selectedObject?.userData?.z}]`)
       }
       else {
         clearBlock(intersections[0]);
@@ -214,20 +229,63 @@ export function createScene() {
 
   function onMouseMove(event) {
     camera.onMouseMove(event);
-
+  
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
     mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
-
+  
     raycaster.setFromCamera(mouse, camera.camera);
-
+  
     intersections = raycaster.intersectObjects(scene.children, false);
-
+  
+    if (selectedObject) {
+      selectedObject.material.emissive.setHex(0);
+      if (selectedObject.userData.isTemporary) {
+        const x = selectedObject.userData.x;
+        const y = selectedObject.userData.y;
+        const z = selectedObject.userData.z;
+        terrain[x][z][y] = undefined;
+        scene.remove(selectedObject);
+      }
+      selectedObject = undefined;
+    }
+  
     if (intersections.length > 0) {
-      if (selectedObject) selectedObject.material.emissive.setHex(0);
-      selectedObject = intersections[0].object;
-      selectedObject.material.emissive.setHex(0x555555);
+      if (activeToolId === 'bulldoze') {
+        selectedObject = intersections[0].object;
+        selectedObject.material.emissive.setHex(0x555555);
+      } else {
+        // Highlight where the new block would be placed
+        const intersectedBlock = intersections[0].object;
+        const normal = intersections[0].face.normal;
+        const x = intersectedBlock.userData.x + normal.x;
+        let y = intersectedBlock.userData.y; //+ normal.y;
+        const z = intersectedBlock.userData.z + normal.z;
+  
+        if (x >= 0 && x < terrain.length &&
+          y >= 0 && y < terrain[0].length &&
+          z >= 0 && z < terrain[0][0].length) {
+
+            /*
+            if (terrain[x][y + 1][z] == undefined) {
+              y = y + 1;
+            }
+            */
+          
+          // Use a temporary highlight block or existing block to highlight the position
+          const highlightBlock = terrain[x][y][z];
+          if (highlightBlock) {
+            selectedObject = highlightBlock;
+          } else {
+            selectedObject = createAssetInstance('sky', x, y, z);
+            selectedObject.userData.isTemporary = true;
+            scene.add(selectedObject);
+          }
+          selectedObject.material.emissive.setHex(0x555555);
+        }
+      }
     }
   }
+  
 
   return {
     onObjectSelected,

@@ -44,7 +44,7 @@ const assets = {
     return mesh;
   },
   'sky': (x, y, z) => {
-    const material = new THREE.MeshLambertMaterial({ transparent: true, opacity: 0 });
+    const material = new THREE.MeshLambertMaterial({ color: 0x4444440, transparent: false, opacity: 0.5 });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.userData = { id: 'sky', x, y, z };
     mesh.scale.set(1, 1, 1);
