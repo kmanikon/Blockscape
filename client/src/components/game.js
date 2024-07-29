@@ -9,7 +9,7 @@ import buildingFactory from './buildings.js';
  * @returns a Game object
  */
 
-let activeToolId = 'bulldoze';
+let activeToolId = 'residential';
 
 const setActiveToolId = (toolId) => {
     activeToolId = toolId;

@@ -22,6 +22,7 @@ export function createScene() {
 
   let terrain = [];
   let highlightedBlocks = [];
+  let userHighlightedBlock = [];
 
   let intersections = [];
 
@@ -53,6 +54,7 @@ export function createScene() {
       }
     }
 
+    /*
     for (let x = 0; x < city.size; x++) {
       for (let y = 0; y < city.size; y++) {
         const terrainId = 'sky';
@@ -61,6 +63,8 @@ export function createScene() {
         terrain[x][1][y] = mesh;
       }
     }
+    */
+    
 
     setupLights();
   }
@@ -101,9 +105,11 @@ export function createScene() {
   }
 
   function isPlaceable(x, y, z) {
+    /*
     if (terrain[x][y][z] && terrain[x][y][z].userData.id !== 'sky') {
       return false;
     }
+    */
 
     const neighbors = [
       [x - 1, y, z], [x + 1, y, z],
@@ -114,8 +120,9 @@ export function createScene() {
     for (let [nx, ny, nz] of neighbors) {
       if (nx >= 0 && nx < terrain.length &&
         ny >= 0 && ny < terrain[0].length &&
-        nz >= 0 && nz < terrain[0][0].length &&
-        terrain[nx][ny][nz] && terrain[nx][ny][nz].userData.id !== 'sky') {
+        nz >= 0 && nz < terrain[0][0].length
+        //terrain[nx][ny][nz] && terrain[nx][ny][nz].userData.id !== 'sky'
+      ) {
         return true;
       }
     }
@@ -134,7 +141,7 @@ export function createScene() {
         ny >= 0 && ny < terrain[0].length &&
         nz >= 0 && nz < terrain[0][0].length) {
         const neighborBlock = terrain[nx][ny][nz];
-        if (neighborBlock && neighborBlock.userData.id === 'sky') {
+        if (neighborBlock) {// && neighborBlock.userData.id === 'sky') {
           neighborBlock.material.emissive.setHex(0x555555);
           highlightedBlocks.push(neighborBlock);
         }
@@ -188,6 +195,23 @@ export function createScene() {
       }
   }
 
+
+/*
+  HIGHLIGHTING LOGIC HERE
+*/
+
+  function placeHighlightBlock(intersection) {
+      selectedObject = intersections[0].object;
+
+      let selectObjectAdjacent = selectedObject;
+      selectObjectAdjacent.userData.x = 3;
+      selectedObject.material.emissive.setHex(0x555555);
+  }
+  
+
+
+
+
   function setupLights() {
     const lights = [
       new THREE.AmbientLight(0xffffff, 0.2),
@@ -237,6 +261,7 @@ export function createScene() {
   
     intersections = raycaster.intersectObjects(scene.children, false);
   
+    
     if (selectedObject) {
       selectedObject.material.emissive.setHex(0);
       if (selectedObject.userData.isTemporary) {
@@ -249,41 +274,70 @@ export function createScene() {
       selectedObject = undefined;
     }
   
+    
     if (intersections.length > 0) {
       if (activeToolId === 'bulldoze') {
         selectedObject = intersections[0].object;
         selectedObject.material.emissive.setHex(0x555555);
       } else {
+        
+        //placeBlock(intersections[0]);
+
+        placeHighlightBlock(intersections[0]);
+        /*
         // Highlight where the new block would be placed
         const intersectedBlock = intersections[0].object;
         const normal = intersections[0].face.normal;
+
+        
         const x = intersectedBlock.userData.x + normal.x;
-        let y = intersectedBlock.userData.y; //+ normal.y;
+        let y = intersectedBlock.userData.y + normal.y;
         const z = intersectedBlock.userData.z + normal.z;
+
+        //alert(`${x}, ${y}, ${z}`);
+
+
+        if (x >= 0 && x < terrain.length &&
+          y >= 0 && y < terrain[0].length &&
+          z >= 0 && z < terrain[0][0].length
+        ) {
+
+          if (terrain[x][y][z]) {
+          
+          terrain[x][y][z].material.emissive.setHex(0x555555);
+          }
+        }
+        
   
         if (x >= 0 && x < terrain.length &&
           y >= 0 && y < terrain[0].length &&
-          z >= 0 && z < terrain[0][0].length) {
+          z >= 0 && z < terrain[0][0].length
+        ) {
+          
 
-            /*
-            if (terrain[x][y + 1][z] == undefined) {
-              y = y + 1;
-            }
-            */
+           
           
           // Use a temporary highlight block or existing block to highlight the position
+          
+          
           const highlightBlock = terrain[x][y][z];
           if (highlightBlock) {
             selectedObject = highlightBlock;
           } else {
-            selectedObject = createAssetInstance('sky', x, y, z);
+            //selectedObject = createAssetInstance('sky', x, y, z);
             selectedObject.userData.isTemporary = true;
             scene.add(selectedObject);
           }
-          selectedObject.material.emissive.setHex(0x555555);
+          
+          //selectedObject.material.emissive.setHex(0x555555);
+          
         }
+        */
+          
       }
     }
+    
+    
   }
   
 
