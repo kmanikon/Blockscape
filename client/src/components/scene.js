@@ -201,12 +201,144 @@ export function createScene() {
 */
 
   function placeHighlightBlock(intersection) {
+      clearHighlights();
+
+      const intersectedBlock = intersection.object;
+      const normal = intersection.face.normal;
+
+      let x = intersectedBlock.userData.x + Math.round(normal.x);
+      let y = intersectedBlock.userData.y + Math.round(normal.y);
+      let z = intersectedBlock.userData.z + Math.round(normal.z);
+
+      x = Math.max(0, Math.min(x, terrain.length - 1));
+      y = Math.max(0, Math.min(y, terrain[0].length - 1));
+      z = Math.max(0, Math.min(z, terrain[0][0].length - 1));
+
+      highlightAdjacentFaces(x, y, z);
+  }
+
+  function clearHighlights() {
+      highlightedBlocks.forEach(highlight => {
+        scene.remove(highlight);
+      });
+      highlightedBlocks = [];
+  }
+
+  function highlightAdjacentFaces(x, y, z) {
+      const adjacentPositions = [
+        {x: x-1, y: y, z: z, face: 'right'},
+        {x: x+1, y: y, z: z, face: 'left'},
+        {x: x, y: y-1, z: z, face: 'top'},
+        {x: x, y: y+1, z: z, face: 'bottom'},
+        {x: x, y: y, z: z-1, face: 'front'},
+        {x: x, y: y, z: z+1, face: 'back'}
+      ];
+
+      adjacentPositions.forEach(pos => {
+        if (isValidPosition(pos.x, pos.y, pos.z) && terrain[pos.x][pos.y][pos.z]) {
+          highlightBlockFace(terrain[pos.x][pos.y][pos.z], pos.face);
+        }
+      });
+  }
+
+  function isValidPosition(x, y, z) {
+      return x >= 0 && x < terrain.length &&
+            y >= 0 && y < terrain[0].length &&
+            z >= 0 && z < terrain[0][0].length;
+  }
+
+  function highlightBlockFace(block, face) {
+      const highlightMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.5,
+        side: THREE.DoubleSide
+      });
+
+      const highlightGeometry = new THREE.PlaneGeometry(1, 1);
+      const highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial);
+
+      positionHighlight(highlightMesh, block, face);
+
+      scene.add(highlightMesh);
+      highlightedBlocks.push(highlightMesh);
+  }
+
+  function positionHighlight(highlightMesh, block, face) {
+      highlightMesh.position.copy(block.position);
+
+      const offset = 0.000; // Slight offset to prevent z-fighting
+
+      
+      switch(face) {
+        case 'left':
+          highlightMesh.rotation.y = Math.PI / 2;
+          highlightMesh.position.x -= 0.5 + offset;
+          break;
+        case 'right':
+          highlightMesh.rotation.y = -Math.PI / 2;
+          highlightMesh.position.x += 0.5 + offset;
+          break;
+        case 'top':
+          highlightMesh.rotation.x = -Math.PI / 2;
+          highlightMesh.position.y += 0.5 + offset;
+          break;
+        case 'bottom':
+          highlightMesh.rotation.x = Math.PI / 2;
+          highlightMesh.position.y -= 0.5 + offset;
+          break;
+        case 'front':
+          highlightMesh.position.z += 0.5 + offset;
+          break;
+        case 'back':
+          highlightMesh.rotation.y = Math.PI;
+          highlightMesh.position.z -= 0.5 + offset;
+          break;
+      }
+      
+  }
+
+
+/*
+
+        modify x, y, z here
+
+        consider this scene file for a Three.js 3D game:
+
+        modify placeHighlightBlock so that x, y, and z are adjusted so 
+        that the new highlighted block is placed in the closest, empty 
+        spot with respect to the cursor. Use the normal attribute in Three.js
+*/
+
+
+/*
+  function placeHighlightBlock(intersection) {
       selectedObject = intersections[0].object;
 
       let selectObjectAdjacent = selectedObject;
-      selectObjectAdjacent.userData.x = 3;
+
+      
+      //let x = selectObjectAdjacent.userData.x;
+      //let y = selectObjectAdjacent.userData.y;
+      //let z = selectObjectAdjacent.userData.z;
+
+
+      
+      //if (userHighlightedBlock.length > 0) {
+      //  scene.remove(userHighlightedBlock[0])
+      //  userHighlightedBlock.pop();
+      //}
+            
+      //selectObjectAdjacent = createAssetInstance('sky', x, y, z);
+      //scene.add(selectObjectAdjacent);
+      //userHighlightedBlock.push(selectObjectAdjacent);
+      
+
       selectedObject.material.emissive.setHex(0x555555);
+      
   }
+  */
+  
   
 
 
@@ -243,7 +375,7 @@ export function createScene() {
     if (intersections.length > 0) {
       if (activeToolId !== 'bulldoze') {
         placeBlock(intersections[0]);
-        alert(`Placed Block at [${selectedObject?.userData?.x}, ${selectedObject?.userData?.y}, ${selectedObject?.userData?.z}]`)
+        //alert(`Placed Block at [${selectedObject?.userData?.x}, ${selectedObject?.userData?.y}, ${selectedObject?.userData?.z}]`)
       }
       else {
         clearBlock(intersections[0]);
