@@ -5,6 +5,20 @@ import { activeToolId } from './game.js';
 
 const ymax = 2;
 
+let selectedObject = undefined;
+let highlightedBlocks = [];
+let intersections = [];
+let terrain = [];
+
+function clearHighlightedBlocks() {
+  for (let block of highlightedBlocks) {
+    if (block?.material?.emissive){
+      block.material.emissive.setHex(0);
+    }
+  }
+  highlightedBlocks = [];
+}
+
 export function createScene() {
   const gameWindow = document.getElementById('render-target');
   const scene = new THREE.Scene();
@@ -18,13 +32,11 @@ export function createScene() {
 
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
-  let selectedObject = undefined;
+  //let selectedObject = undefined;
 
-  let terrain = [];
-  let highlightedBlocks = [];
+  
+  //let highlightedBlocks = [];
   let userHighlightedBlock = [];
-
-  let intersections = [];
 
   let onObjectSelected = undefined;
 
@@ -147,13 +159,6 @@ export function createScene() {
         }
       }
     }
-  }
-
-  function clearHighlightedBlocks() {
-    for (let block of highlightedBlocks) {
-      block.material.emissive.setHex(0);
-    }
-    highlightedBlocks = [];
   }
 
   function placeBlock(intersection) {
@@ -299,50 +304,6 @@ export function createScene() {
   }
 
 
-/*
-
-        modify x, y, z here
-
-        consider this scene file for a Three.js 3D game:
-
-        modify placeHighlightBlock so that x, y, and z are adjusted so 
-        that the new highlighted block is placed in the closest, empty 
-        spot with respect to the cursor. Use the normal attribute in Three.js
-*/
-
-
-/*
-  function placeHighlightBlock(intersection) {
-      selectedObject = intersections[0].object;
-
-      let selectObjectAdjacent = selectedObject;
-
-      
-      //let x = selectObjectAdjacent.userData.x;
-      //let y = selectObjectAdjacent.userData.y;
-      //let z = selectObjectAdjacent.userData.z;
-
-
-      
-      //if (userHighlightedBlock.length > 0) {
-      //  scene.remove(userHighlightedBlock[0])
-      //  userHighlightedBlock.pop();
-      //}
-            
-      //selectObjectAdjacent = createAssetInstance('sky', x, y, z);
-      //scene.add(selectObjectAdjacent);
-      //userHighlightedBlock.push(selectObjectAdjacent);
-      
-
-      selectedObject.material.emissive.setHex(0x555555);
-      
-  }
-  */
-  
-  
-
-
-
 
   function setupLights() {
     const lights = [
@@ -395,7 +356,9 @@ export function createScene() {
   
     
     if (selectedObject) {
-      selectedObject.material.emissive.setHex(0);
+      if (selectedObject?.material?.emissive) {
+        selectedObject.material.emissive.setHex(0);
+      }
       if (selectedObject.userData.isTemporary) {
         const x = selectedObject.userData.x;
         const y = selectedObject.userData.y;
@@ -407,10 +370,12 @@ export function createScene() {
     }
   
     
-    if (intersections.length > 0) {
+    if (intersections.length > 0 && intersections[0]?.object?.material) {
       if (activeToolId === 'bulldoze') {
         selectedObject = intersections[0].object;
-        selectedObject.material.emissive.setHex(0x555555);
+        if (selectedObject?.material?.emissive) {
+          selectedObject.material.emissive.setHex(0x555555);
+        }
       } else {
         
         //placeBlock(intersections[0]);
@@ -471,12 +436,6 @@ export function createScene() {
     
     
   }
-
-  function handleTypeSwitch() {
-    clearHighlightedBlocks();
-    selectedObject.material.emissive.setHex(0);
-    selectedObject = undefined;
-  }
   
 
   return {
@@ -486,7 +445,28 @@ export function createScene() {
     start,
     stop,
     onMouseDown,
-    onMouseMove,
-    handleTypeSwitch
+    onMouseMove
   }
 }
+
+
+// TODO: Clear highlighted blocks when switching from placing to bulldoze
+export function handleTypeSwitch() {
+  console.log(highlightedBlocks);
+
+  for (let block of highlightedBlocks) {
+      //block.material.emissive?.setHex(0);
+      console.log(block);
+  }
+  
+  /*
+    //if (highlightedBlocks.length > 0) {
+      //alert('clearing...')
+      clearHighlightedBlocks();
+   // }
+    if (selectedObject && selectedObject?.material) {
+      selectedObject.material.emissive.setHex(0);
+      selectedObject = undefined;
+    }
+    */
+  }

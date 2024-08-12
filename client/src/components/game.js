@@ -1,4 +1,4 @@
-import { createScene } from './scene.js';
+import { createScene, handleTypeSwitch } from './scene.js';
 import { createCity } from './city.js';
 import buildingFactory from './buildings.js';
 
@@ -12,7 +12,7 @@ import buildingFactory from './buildings.js';
 let activeToolId = 'residential';
 
 const setActiveToolId = (toolId) => {
-    //handleTypeSwitch();
+    handleTypeSwitch();
     activeToolId = toolId;
     //console.log(toolId);
     alert(toolId);
@@ -55,6 +55,7 @@ export function createGame() {
       // Update the city data model first, then update the scene
       city.update();
       scene.update(city);
+      handleTypeSwitch();
     }
   }
 
