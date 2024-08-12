@@ -12,6 +12,7 @@ import buildingFactory from './buildings.js';
 let activeToolId = 'residential';
 
 const setActiveToolId = (toolId) => {
+    //handleTypeSwitch();
     activeToolId = toolId;
     //console.log(toolId);
     alert(toolId);

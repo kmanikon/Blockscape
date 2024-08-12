@@ -471,6 +471,12 @@ export function createScene() {
     
     
   }
+
+  function handleTypeSwitch() {
+    clearHighlightedBlocks();
+    selectedObject.material.emissive.setHex(0);
+    selectedObject = undefined;
+  }
   
 
   return {
@@ -480,6 +486,7 @@ export function createScene() {
     start,
     stop,
     onMouseDown,
-    onMouseMove
+    onMouseMove,
+    handleTypeSwitch
   }
 }
