@@ -19,8 +19,13 @@ function App() {
 
     window.game = createGame();
 
-    
   }, []);
+
+
+  const swapTool = (toolId) => {
+    setActiveToolId(toolId)
+    window.game.clearHighlights();
+  }
 
     
 
@@ -31,11 +36,11 @@ function App() {
         </div>
       
         <div id="ui-toolbar">
-            <button id='button-bulldoze' className="ui-button selected" onClick={() => setActiveToolId('bulldoze') }>CLEAR</button>
-            <button id='button-residential' className="ui-button" onClick={() => setActiveToolId('residential') }>GREEN</button>
-            <button id='button-commercial' className="ui-button" onClick={() => setActiveToolId('commercial')}>BLUE</button>
-            <button id='button-industrial' className="ui-button" onClick={() => setActiveToolId('industrial')}>YELLOW</button>
-            <button id='button-road' className="ui-button" onClick={() => setActiveToolId('road')}>TILE</button>
+            <button id='button-bulldoze' className="ui-button selected" onClick={() => swapTool('bulldoze') }>CLEAR</button>
+            <button id='button-residential' className="ui-button" onClick={() => swapTool('residential') }>GREEN</button>
+            <button id='button-commercial' className="ui-button" onClick={() => swapTool('commercial')}>BLUE</button>
+            <button id='button-industrial' className="ui-button" onClick={() => swapTool('industrial')}>YELLOW</button>
+            <button id='button-road' className="ui-button" onClick={() => swapTool('road')}>TILE</button>
         </div>
     </div>
   );

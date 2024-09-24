@@ -50,6 +50,14 @@ export function createGame() {
   document.addEventListener('mousemove', scene.onMouseMove.bind(scene), false);
   document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
 
+
+  const game = {
+    clearHighlights() {
+      scene.clearHighlights();
+    }
+  }
+
+  /*
   const game = {
     update() {
       // Update the city data model first, then update the scene
@@ -58,6 +66,7 @@ export function createGame() {
       handleTypeSwitch();
     }
   }
+  */
 
   /*
   // Start update interval

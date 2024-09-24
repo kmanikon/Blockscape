@@ -223,6 +223,7 @@ export function createScene() {
   }
 
   function clearHighlights() {
+      //alert('clearing highlights...')
       highlightedBlocks.forEach(highlight => {
         scene.remove(highlight);
       });
@@ -257,7 +258,10 @@ export function createScene() {
         color: 0xffffff,
         transparent: true,
         opacity: 0.5,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
+        polygonOffset: true,       // Enable polygon offset
+        polygonOffsetFactor: -0.5,   // Offset to push the highlight plane forward
+        polygonOffsetUnits: -0.5
       });
 
       const highlightGeometry = new THREE.PlaneGeometry(1, 1);
@@ -433,6 +437,9 @@ export function createScene() {
           
       }
     }
+    else if (selectedObject){
+      selectedObject.material.emissive.setHex(0);
+    }
     
     
   }
@@ -445,7 +452,8 @@ export function createScene() {
     start,
     stop,
     onMouseDown,
-    onMouseMove
+    onMouseMove,
+    clearHighlights
   }
 }
 
