@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { createCamera } from './camera.js';
 import { createAssetInstance } from './assets.js';
-import { activeToolId } from './game.js';
+import { activeToolData } from './game.js';
 
 const ymax = 2;
 
@@ -59,7 +59,7 @@ export function createScene() {
 
     for (let x = 0; x < city.size; x++) {
       for (let y = 0; y < city.size; y++) {
-        const terrainId = 'grass';
+        const terrainId = 'foundation';
         const mesh = createAssetInstance(terrainId, x, 0, y);
         scene.add(mesh);
         terrain[x][0][y] = mesh;
@@ -89,31 +89,6 @@ export function createScene() {
       return max;
     }
     return val;
-  }
-
-  function update(city) {
-    alert('calling scene update...')
-    const x = boundVal(selectedObject.userData.x, 0, city.size);
-    const y = boundVal(selectedObject.userData.y + 1, 0, city.size);
-    const z = boundVal(selectedObject.userData.z, 0, city.size);
-
-    const previousBlock = terrain[x][z][y];
-
-    if (activeToolId !== 'bulldoze') {
-      const newBlock = createAssetInstance(activeToolId, x, y, z, undefined);
-      scene.remove(previousBlock);
-      scene.add(newBlock);
-      terrain[x][z][y] = newBlock;
-
-      clearHighlightedBlocks();
-      highlightAdjacentBlocks(x, y, z);
-    }
-    else {
-     
-      scene.remove(previousBlock);
-      terrain[x][z][y] = undefined;
-    }
-
   }
 
   function isPlaceable(x, y, z) {
@@ -177,7 +152,9 @@ export function createScene() {
         scene.remove(terrain[x][y][z]);
         terrain[x][y][z] = undefined;
       }
-      const newBlock = createAssetInstance(activeToolId, x, y, z);
+
+      console.log(activeToolData);
+      const newBlock = createAssetInstance(activeToolData.id, x, y, z, { color: activeToolData.color });
       scene.add(newBlock);
       terrain[x][y][z] = newBlock;
     }
@@ -194,7 +171,6 @@ export function createScene() {
       y >= 0 && y < terrain[0].length &&
       z >= 0 && z < terrain[0][0].length && 
       isPlaceable(x, y, z)) {
-        //const newBlock = createAssetInstance(activeToolId, x, y, z);
         scene.remove(intersectedBlock);
         terrain[x][y][z] = undefined;
       }
@@ -338,7 +314,7 @@ export function createScene() {
 
   function onMouseDown(event) {
     if (intersections.length > 0) {
-      if (activeToolId !== 'bulldoze') {
+      if (activeToolData.id !== 'bulldoze') {
         placeBlock(intersections[0]);
         //alert(`Placed Block at [${selectedObject?.userData?.x}, ${selectedObject?.userData?.y}, ${selectedObject?.userData?.z}]`)
       }
@@ -375,7 +351,7 @@ export function createScene() {
   
     
     if (intersections.length > 0 && intersections[0]?.object?.material) {
-      if (activeToolId === 'bulldoze') {
+      if (activeToolData.id === 'bulldoze') {
         selectedObject = intersections[0].object;
         if (selectedObject?.material?.emissive) {
           selectedObject.material.emissive.setHex(0x555555);
@@ -448,7 +424,6 @@ export function createScene() {
   return {
     onObjectSelected,
     initialize,
-    update,
     start,
     stop,
     onMouseDown,
@@ -460,7 +435,7 @@ export function createScene() {
 
 // TODO: Clear highlighted blocks when switching from placing to bulldoze
 export function handleTypeSwitch() {
-  console.log(highlightedBlocks);
+  //console.log(highlightedBlocks);
 
   for (let block of highlightedBlocks) {
       //block.material.emissive?.setHex(0);

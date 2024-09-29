@@ -1,15 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 
-import { createGame, setActiveToolId } from './components/game.js';
+import { createGame, setActiveToolData } from './components/game.js';
 
 import './App.css';
-
-var toolId = 'commercial';
 
 function App() {
   const refContainer = useRef(null);
 
-  let game;
   useEffect(() => {
     if (refContainer.current) {
       while (refContainer.current.firstChild) {
@@ -22,12 +19,12 @@ function App() {
   }, []);
 
 
-  const swapTool = (toolId) => {
-    setActiveToolId(toolId)
+  const swapTool = (toolId, toolColor) => {
+    const newTool = { id: toolId, color: toolColor || 0x000000 }
+    setActiveToolData(newTool)
     window.game.clearHighlights();
   }
 
-    
 
   return (
     <div>
@@ -37,15 +34,13 @@ function App() {
       
         <div id="ui-toolbar">
             <button id='button-bulldoze' className="ui-button selected" onClick={() => swapTool('bulldoze') }>CLEAR</button>
-            <button id='button-residential' className="ui-button" onClick={() => swapTool('residential') }>GREEN</button>
-            <button id='button-commercial' className="ui-button" onClick={() => swapTool('commercial')}>BLUE</button>
-            <button id='button-industrial' className="ui-button" onClick={() => swapTool('industrial')}>YELLOW</button>
-            <button id='button-road' className="ui-button" onClick={() => swapTool('road')}>TILE</button>
+            <button id='button-residential' className="ui-button" onClick={() => swapTool('player_block', 0x008000) }>GREEN</button>
+            <button id='button-commercial' className="ui-button" onClick={() => swapTool('player_block', 0x0000FF)}>BLUE</button>
+            <button id='button-industrial' className="ui-button" onClick={() => swapTool('player_block', 0xFFFF00)}>YELLOW</button>
+            <button id='button-industrial' className="ui-button" onClick={() => swapTool('player_block', 0x00000A)}>BLACK</button>
         </div>
     </div>
   );
 }
 
 export default App;
-
-export { toolId };

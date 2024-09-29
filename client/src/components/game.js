@@ -1,21 +1,16 @@
 import { createScene, handleTypeSwitch } from './scene.js';
 import { createCity } from './city.js';
-import buildingFactory from './buildings.js';
-
-//import { toolId } from '../App.js';
 
 /**
  * Creates a new Game object
  * @returns a Game object
  */
 
-let activeToolId = 'residential';
+let activeToolData = { id: '', color: 0x000000 };
 
-const setActiveToolId = (toolId) => {
+const setActiveToolData = (toolData) => {
     handleTypeSwitch();
-    activeToolId = toolId;
-    //console.log(toolId);
-    alert(toolId);
+    activeToolData = { id: toolData.id, color: toolData.color };
 }
 
 export function createGame() {
@@ -25,25 +20,6 @@ export function createGame() {
 
   scene.initialize(city);
 
-  scene.onObjectSelected = (selectedObject) => {
-    let { x, y, z } = selectedObject.userData;
-    
-    const tile = city.data[x][y][z];
-
-    console.log(tile)
-    /*
-    //if (x >= 0 && x < city.size && y > 0 && y < city.size && z >= 0 && z < city.size) {
-    
-      if (activeToolId === 'bulldoze') {
-        tile.building = undefined;
-        scene.update(city);
-      } else if (!tile.building) {
-        tile.building = buildingFactory[activeToolId]();
-        scene.update(city);
-      }
-    //}
-    */
-  }
 
   // Hook up mouse event handlers to the scene
   document.addEventListener('mousedown', scene.onMouseDown.bind(scene), false);
@@ -57,27 +33,9 @@ export function createGame() {
     }
   }
 
-  /*
-  const game = {
-    update() {
-      // Update the city data model first, then update the scene
-      city.update();
-      scene.update(city);
-      handleTypeSwitch();
-    }
-  }
-  */
-
-  /*
-  // Start update interval
-  setInterval(() => {
-    game.update();
-  }, 1000)
-  */
-
   scene.start();
 
   return game;
 }
 
-export { activeToolId, setActiveToolId };
+export { activeToolData, setActiveToolData };
