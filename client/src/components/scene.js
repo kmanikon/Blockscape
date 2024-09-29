@@ -3,21 +3,10 @@ import { createCamera } from './camera.js';
 import { createAssetInstance } from './assets.js';
 import { activeToolData } from './game.js';
 
-const ymax = 2;
-
 let selectedObject = undefined;
 let highlightedBlocks = [];
 let intersections = [];
 let terrain = [];
-
-function clearHighlightedBlocks() {
-  for (let block of highlightedBlocks) {
-    if (block?.material?.emissive){
-      block.material.emissive.setHex(0);
-    }
-  }
-  highlightedBlocks = [];
-}
 
 export function createScene() {
   const gameWindow = document.getElementById('render-target');
@@ -32,11 +21,6 @@ export function createScene() {
 
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
-  //let selectedObject = undefined;
-
-  
-  //let highlightedBlocks = [];
-  let userHighlightedBlock = [];
 
   let onObjectSelected = undefined;
 
@@ -65,18 +49,6 @@ export function createScene() {
         terrain[x][0][y] = mesh;
       }
     }
-
-    /*
-    for (let x = 0; x < city.size; x++) {
-      for (let y = 0; y < city.size; y++) {
-        const terrainId = 'sky';
-        const mesh = createAssetInstance(terrainId, x, 1, y);
-        scene.add(mesh);
-        terrain[x][1][y] = mesh;
-      }
-    }
-    */
-    
 
     setupLights();
   }
@@ -116,26 +88,6 @@ export function createScene() {
     return false;
   }
 
-  function highlightAdjacentBlocks(x, y, z) {
-    const neighbors = [
-      [x - 1, y, z], [x + 1, y, z],
-      [x, y - 1, z], [x, y + 1, z],
-      [x, y, z - 1], [x, y, z + 1]
-    ];
-
-    for (let [nx, ny, nz] of neighbors) {
-      if (nx >= 0 && nx < terrain.length &&
-        ny >= 0 && ny < terrain[0].length &&
-        nz >= 0 && nz < terrain[0][0].length) {
-        const neighborBlock = terrain[nx][ny][nz];
-        if (neighborBlock) {// && neighborBlock.userData.id === 'sky') {
-          neighborBlock.material.emissive.setHex(0x555555);
-          highlightedBlocks.push(neighborBlock);
-        }
-      }
-    }
-  }
-
   function placeBlock(intersection) {
     const intersectedBlock = intersection.object;
     const normal = intersection.face.normal;
@@ -146,14 +98,12 @@ export function createScene() {
     if (x >= 0 && x < terrain.length &&
       y >= 0 && y < terrain[0].length &&
       z >= 0 && z < terrain[0][0].length) {
-        //alert('hi')
 
       if (terrain[x][y][z] !== undefined) {
         scene.remove(terrain[x][y][z]);
         terrain[x][y][z] = undefined;
       }
 
-      console.log(activeToolData);
       const newBlock = createAssetInstance(activeToolData.id, x, y, z, { color: activeToolData.color });
       scene.add(newBlock);
       terrain[x][y][z] = newBlock;
@@ -199,7 +149,6 @@ export function createScene() {
   }
 
   function clearHighlights() {
-      //alert('clearing highlights...')
       highlightedBlocks.forEach(highlight => {
         scene.remove(highlight);
       });
@@ -233,7 +182,7 @@ export function createScene() {
       const highlightMaterial = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.5,
+        opacity: 0.2,
         side: THREE.DoubleSide,
         polygonOffset: true,       // Enable polygon offset
         polygonOffsetFactor: -0.5,   // Offset to push the highlight plane forward
@@ -316,7 +265,6 @@ export function createScene() {
     if (intersections.length > 0) {
       if (activeToolData.id !== 'bulldoze') {
         placeBlock(intersections[0]);
-        //alert(`Placed Block at [${selectedObject?.userData?.x}, ${selectedObject?.userData?.y}, ${selectedObject?.userData?.z}]`)
       }
       else {
         clearBlock(intersections[0]);
@@ -358,59 +306,9 @@ export function createScene() {
         }
       } else {
         
-        //placeBlock(intersections[0]);
 
         placeHighlightBlock(intersections[0]);
-        /*
-        // Highlight where the new block would be placed
-        const intersectedBlock = intersections[0].object;
-        const normal = intersections[0].face.normal;
-
-        
-        const x = intersectedBlock.userData.x + normal.x;
-        let y = intersectedBlock.userData.y + normal.y;
-        const z = intersectedBlock.userData.z + normal.z;
-
-        //alert(`${x}, ${y}, ${z}`);
-
-
-        if (x >= 0 && x < terrain.length &&
-          y >= 0 && y < terrain[0].length &&
-          z >= 0 && z < terrain[0][0].length
-        ) {
-
-          if (terrain[x][y][z]) {
-          
-          terrain[x][y][z].material.emissive.setHex(0x555555);
-          }
-        }
-        
-  
-        if (x >= 0 && x < terrain.length &&
-          y >= 0 && y < terrain[0].length &&
-          z >= 0 && z < terrain[0][0].length
-        ) {
-          
-
-           
-          
-          // Use a temporary highlight block or existing block to highlight the position
-          
-          
-          const highlightBlock = terrain[x][y][z];
-          if (highlightBlock) {
-            selectedObject = highlightBlock;
-          } else {
-            //selectedObject = createAssetInstance('sky', x, y, z);
-            selectedObject.userData.isTemporary = true;
-            scene.add(selectedObject);
-          }
-          
-          //selectedObject.material.emissive.setHex(0x555555);
-          
-        }
-        */
-          
+       
       }
     }
     else if (selectedObject){
@@ -432,24 +330,3 @@ export function createScene() {
   }
 }
 
-
-// TODO: Clear highlighted blocks when switching from placing to bulldoze
-export function handleTypeSwitch() {
-  //console.log(highlightedBlocks);
-
-  for (let block of highlightedBlocks) {
-      //block.material.emissive?.setHex(0);
-      console.log(block);
-  }
-  
-  /*
-    //if (highlightedBlocks.length > 0) {
-      //alert('clearing...')
-      clearHighlightedBlocks();
-   // }
-    if (selectedObject && selectedObject?.material) {
-      selectedObject.material.emissive.setHex(0);
-      selectedObject = undefined;
-    }
-    */
-  }

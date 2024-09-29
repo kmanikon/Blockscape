@@ -16,7 +16,6 @@ const geometry = new THREE.BoxGeometry(1, 1, 1);
 const assets = { 
 
   'player_block': (x, y, z, data) => {
-    console.log(data);
     const material = new THREE.MeshLambertMaterial({ color: data.color });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.userData = { id: 'player_block', x, y, z };

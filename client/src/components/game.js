@@ -1,4 +1,4 @@
-import { createScene, handleTypeSwitch } from './scene.js';
+import { createScene } from './scene.js';
 import { createCity } from './city.js';
 
 /**
@@ -9,7 +9,6 @@ import { createCity } from './city.js';
 let activeToolData = { id: '', color: 0x000000 };
 
 const setActiveToolData = (toolData) => {
-    handleTypeSwitch();
     activeToolData = { id: toolData.id, color: toolData.color };
 }
 
