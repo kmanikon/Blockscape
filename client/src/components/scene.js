@@ -8,6 +8,9 @@ let highlightedBlocks = [];
 let intersections = [];
 let terrain = [];
 
+let currentlyHighlightedBlock = null;
+let currentlyHighlightedFace = null;
+
 export function createScene() {
   const gameWindow = document.getElementById('render-target');
   const scene = new THREE.Scene();
@@ -131,46 +134,62 @@ export function createScene() {
   HIGHLIGHTING LOGIC HERE
 */
 
-  function placeHighlightBlock(intersection) {
-      clearHighlights();
+function placeHighlightBlock(intersection) {
+  const intersectedBlock = intersection.object;
+  const normal = intersection.face.normal;
 
-      const intersectedBlock = intersection.object;
-      const normal = intersection.face.normal;
+  let x = intersectedBlock.userData.x + Math.round(normal.x);
+  let y = intersectedBlock.userData.y + Math.round(normal.y);
+  let z = intersectedBlock.userData.z + Math.round(normal.z);
 
-      let x = intersectedBlock.userData.x + Math.round(normal.x);
-      let y = intersectedBlock.userData.y + Math.round(normal.y);
-      let z = intersectedBlock.userData.z + Math.round(normal.z);
+  x = Math.max(0, Math.min(x, terrain.length - 1));
+  y = Math.max(0, Math.min(y, terrain[0].length - 1));
+  z = Math.max(0, Math.min(z, terrain[0][0].length - 1));
 
-      x = Math.max(0, Math.min(x, terrain.length - 1));
-      y = Math.max(0, Math.min(y, terrain[0].length - 1));
-      z = Math.max(0, Math.min(z, terrain[0][0].length - 1));
-
-      highlightAdjacentFaces(x, y, z);
+  
+  // Check if we are still hovering over the same block and face
+  if (currentlyHighlightedBlock === intersectedBlock && currentlyHighlightedFace === normal) {
+    // No need to update highlight, the block and face are the same
+    return;
   }
+  
 
-  function clearHighlights() {
-      highlightedBlocks.forEach(highlight => {
-        scene.remove(highlight);
-      });
-      highlightedBlocks = [];
-  }
+  // Update highlighted block and face tracking
+  currentlyHighlightedBlock = intersectedBlock;
+  currentlyHighlightedFace = normal;
 
-  function highlightAdjacentFaces(x, y, z) {
-      const adjacentPositions = [
-        {x: x-1, y: y, z: z, face: 'right'},
-        {x: x+1, y: y, z: z, face: 'left'},
-        {x: x, y: y-1, z: z, face: 'top'},
-        {x: x, y: y+1, z: z, face: 'bottom'},
-        {x: x, y: y, z: z-1, face: 'front'},
-        {x: x, y: y, z: z+1, face: 'back'}
-      ];
+  // Clear existing highlights only if block/face has changed
+  clearHighlights();
+  
+  // Highlight adjacent faces as per the logic
+  highlightAdjacentFaces(x, y, z);
+}
 
-      adjacentPositions.forEach(pos => {
-        if (isValidPosition(pos.x, pos.y, pos.z) && terrain[pos.x][pos.y][pos.z]) {
-          highlightBlockFace(terrain[pos.x][pos.y][pos.z], pos.face);
-        }
-      });
-  }
+function clearHighlights() {
+  highlightedBlocks.forEach(highlight => {
+    scene.remove(highlight);
+  });
+  highlightedBlocks = [];
+  currentlyHighlightedBlock = null;
+  currentlyHighlightedFace = null;
+}
+
+function highlightAdjacentFaces(x, y, z) {
+  const adjacentPositions = [
+    {x: x-1, y: y, z: z, face: 'right'},
+    {x: x+1, y: y, z: z, face: 'left'},
+    {x: x, y: y-1, z: z, face: 'top'},
+    {x: x, y: y+1, z: z, face: 'bottom'},
+    {x: x, y: y, z: z-1, face: 'front'},
+    {x: x, y: y, z: z+1, face: 'back'}
+  ];
+
+  adjacentPositions.forEach(pos => {
+    if (isValidPosition(pos.x, pos.y, pos.z) && terrain[pos.x][pos.y][pos.z]) {
+      highlightBlockFace(terrain[pos.x][pos.y][pos.z], pos.face);
+    }
+  });
+}
 
   function isValidPosition(x, y, z) {
       return x >= 0 && x < terrain.length &&
@@ -179,29 +198,31 @@ export function createScene() {
   }
 
   function highlightBlockFace(block, face) {
-      const highlightMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.2,
-        side: THREE.DoubleSide,
-        polygonOffset: true,       // Enable polygon offset
-        polygonOffsetFactor: -0.5,   // Offset to push the highlight plane forward
-        polygonOffsetUnits: -0.5
-      });
-
-      const highlightGeometry = new THREE.PlaneGeometry(1, 1);
-      const highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial);
-
-      positionHighlight(highlightMesh, block, face);
-
-      scene.add(highlightMesh);
-      highlightedBlocks.push(highlightMesh);
+    const highlightMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.2,
+      side: THREE.DoubleSide,
+      polygonOffset: true, // Avoid z-fighting
+      polygonOffsetFactor: -0.5,
+    });
+  
+    const highlightGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial);
+  
+    positionHighlight(highlightMesh, block, face);
+  
+    // Disable raycasting for this highlight mesh
+    highlightMesh.raycast = () => {};
+  
+    scene.add(highlightMesh);
+    highlightedBlocks.push(highlightMesh);
   }
 
   function positionHighlight(highlightMesh, block, face) {
       highlightMesh.position.copy(block.position);
 
-      const offset = 0.000; // Slight offset to prevent z-fighting
+      const offset = 0.500; // Slight offset to prevent z-fighting
 
       
       switch(face) {

@@ -29,6 +29,15 @@ const assets = {
     mesh.position.set(x, y, z);
     return mesh;
   },
+  /*
+  'highlightBlock': (x, y, z, data) => {
+    const material = new THREE.MeshLambertMaterial({ color: data.color });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.userData = { id: 'highlightBlock', x, y, z };
+    mesh.position.set(x, y, z);
+    return mesh;
+  },
+  */
 
   
   /*
