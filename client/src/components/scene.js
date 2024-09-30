@@ -318,6 +318,12 @@ function highlightAdjacentFaces(x, y, z) {
       selectedObject = undefined;
     }
   
+
+    // start highlight logic:
+
+    if (activeToolData.id === '') {
+      return;
+    }
     
     if (intersections.length > 0 && intersections[0]?.object?.material) {
       if (activeToolData.id === 'bulldoze') {
