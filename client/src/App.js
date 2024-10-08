@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 
 import { createGame, setActiveToolData } from './components/game.js';
 
+import CubeSvg from './components/CubeSvg';
+
 import './App.css';
 
 function App() {
@@ -33,6 +35,7 @@ function App() {
         </div>
       
         <div id="ui-toolbar">
+          <CubeSvg cubeColor="green"/>
             <button id='button-bulldoze' className="ui-button selected" onClick={() => swapTool('bulldoze') }>CLEAR</button>
             <button id='button-residential' className="ui-button" onClick={() => swapTool('player_block', 0x008000) }>GREEN</button>
             <button id='button-commercial' className="ui-button" onClick={() => swapTool('player_block', 0x0000FF)}>BLUE</button>
