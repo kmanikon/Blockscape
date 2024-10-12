@@ -48,6 +48,6 @@ function createTile(x, y, z) {
     y,
     z,
     terrainId: 'grass',
-    building: undefined
+    //building: undefined
   };
 }

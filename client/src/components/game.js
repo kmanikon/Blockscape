@@ -12,9 +12,9 @@ const setActiveToolData = (toolData) => {
     activeToolData = { id: toolData.id, color: toolData.color };
 }
 
-export function createGame() {
+export function createGame(mode) {
 
-  const scene = createScene();
+  const scene = createScene(mode);
   const city = createCity(16);
 
   scene.initialize(city);

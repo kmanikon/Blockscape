@@ -11,10 +11,10 @@ let terrain = [];
 let currentlyHighlightedBlock = null;
 let currentlyHighlightedFace = null;
 
-export function createScene() {
+export function createScene(mode) {
   const gameWindow = document.getElementById('render-target');
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x777777);
+  scene.background = new THREE.Color(mode === 'light' ? 0xFAFAFA : 0xACACAC);
 
   const camera = createCamera(gameWindow);
 

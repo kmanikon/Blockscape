@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createGame, setActiveToolData } from './components/game.js';
 
 import CubeSvg from './components/CubeSvg';
+import ClearCubeSvg from './components/ClearCubeSvg';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
@@ -14,7 +15,7 @@ import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Button from '@mui/material/Button';
-
+import MainLogo from './assets/yellow_cube.png';
 
 import { Router, Navigation } from '@toolpad/core';
 
@@ -24,17 +25,17 @@ const colorPalette = [
   "#FF6F61",  // Coral
   "#6B5B95",  // Royal Purple
   "#88B04B",  // Soft Green
-  "#F7CAC9",  // Pale Pink
   "#92A8D1",  // Light Blue
-  "#955251",  // Chestnut
-  "#B565A7",  // Orchid
-  "#009B77",  // Emerald
   "#DD4124",  // Fiery Red
-  "#45B8AC",  // Aqua
   "#EFC050",  // Golden Yellow
-  "#5B5EA6",  // Indigo
+  "#009B77",  // Emerald
+  "#B565A7",  // Orchid
   "#9B2335",  // Crimson
+  "#45B8AC",  // Aqua
   "#BC243C",  // Claret
+  "#5B5EA6",  // Indigo
+  "#955251",  // Chestnut
+  "#F7CAC9",  // Pale Pink
   "#F3D6E4"   // Blush
 ];
 
@@ -127,7 +128,7 @@ function App() {
       }
     }
 
-    window.game = createGame();
+    window.game = createGame('dark');
 
   }, []);
 
@@ -154,25 +155,32 @@ function App() {
     },
   });
 
-  
-  const NAVIGATION = colorPalette.map((color) => (
-    /*
-    {
-      kind: 'header',
-      title: 
-        <Button 
-          className="sidebar-clickable"
-          fullWidth
-          style={{padding: 0, justifyContent: 'left'}}
-          onClick={() => swapTool('player_block', color)}
-        >
-          <CubeSvg cubeColor={color}/>
-          <div className="sidebar-text">
-            {color}
-          </div>
-        </Button>
-    }
-    */
+  const clearBlock = [{
+    kind: 'title',
+    segment: 'None',
+    title: <div onClick={() => swapTool('bulldoze')}>Clear</div>,
+    icon: 
+      <Button 
+        className="sidebar-clickable"
+        fullWidth
+        onClick={() => swapTool('bulldoze')}
+        disableRipple
+        disableElevation
+        sx={{
+          ml: 1,
+          "&.MuiButtonBase-root:hover": {
+            bgcolor: "transparent"
+          }
+        }}
+      >
+        <ClearCubeSvg/>
+
+      </Button>,
+   
+  }]
+
+
+  const colorBlocks = colorPalette.map((color) => (
    {
     kind: 'title',
     segment: 'None',
@@ -221,12 +229,13 @@ function App() {
         </div>
         */}
         <AppProvider
-          navigation={NAVIGATION}  // Pass an empty array instead of NAVIGATION
+          navigation={clearBlock.concat(colorBlocks)}  // Pass an empty array instead of NAVIGATION
           theme={demoTheme}
           //sidebar={false}  // Set sidebar to false to attempt to hide it
           branding={{
-            kind: 'header',
-            title: '3D Sandbox'
+            //kind: 'header',
+            title: '3D Sandbox',
+            //logo: <img src={MainLogo} style={{paddingRight: 5}}/>
           }}
           router={{
             navigate: () => null
