@@ -14,11 +14,12 @@ let currentlyHighlightedFace = null;
 export function createScene(mode) {
   const gameWindow = document.getElementById('render-target');
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(mode === 'light' ? 0xFAFAFA : 0xACACAC);
+  //scene.background = new THREE.Color(mode === 'light' ? 0xFAFAFA : 0xACACAC);
 
   const camera = createCamera(gameWindow);
 
-  const renderer = new THREE.WebGLRenderer();
+  const renderer = new THREE.WebGLRenderer({ alpha: true });
+  renderer.setClearColor( 0x000000, 0 );
   renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
   gameWindow.appendChild(renderer.domElement);
 

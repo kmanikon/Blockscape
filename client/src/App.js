@@ -143,7 +143,22 @@ function App() {
     cssVariables: {
       colorSchemeSelector: 'data-toolpad-color-scheme',
     },
-    colorSchemes: { light: true, dark: true },
+    colorSchemes: {
+      light: {
+        palette: {
+          background: {
+            default: '#f5f5f5', // Light grey for the overall layout
+          },
+        },
+      },
+      dark: {
+        palette: {
+          background: {
+            default: '#ECECEC', // Light grey for the overall layout
+          },
+        },
+      },
+    },
     breakpoints: {
       values: {
         xs: 0,
@@ -229,7 +244,10 @@ function App() {
         </div>
         */}
         <AppProvider
-          navigation={clearBlock.concat(colorBlocks)}  // Pass an empty array instead of NAVIGATION
+          navigation={[
+            ...clearBlock,
+            ...colorBlocks,
+          ]}  // Pass an empty array instead of NAVIGATION
           theme={demoTheme}
           //sidebar={false}  // Set sidebar to false to attempt to hide it
           branding={{
@@ -242,10 +260,11 @@ function App() {
           }}
       >
         <DashboardLayout>
-          
         </DashboardLayout>
+
         <div id="render-target" ref={refContainer} style={{ width: 'calc(100vw)', height: 'calc(100vh - 65px)', float: 'right', zIndex: -1 }}>
-          </div>
+        </div>
+        
       </AppProvider>
     </div>
   );
