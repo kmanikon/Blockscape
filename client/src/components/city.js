@@ -3,6 +3,7 @@
  * @param {number} size The size of the city (# of tiles wide) 
  * @returns a City object
  */
+
 export function createCity(size) {
   const data = [];
 
@@ -15,28 +16,23 @@ export function createCity(size) {
     for (let x = 0; x < size; x++) {
       const column = [];
       for (let y = 0; y < size; y++) {
-        const tile = createTile(x, y);
-        column.push(tile);
+
+        const row = [];
+        for (let z = 0; z < size; z++) {
+          const tile = createTile(x, y, z);
+          row.push(tile);
+        }
+        column.push(row);
       }
       data.push(column);
     }
   }
 
-  /**
-   * Update the state of each tile in the city
-   */
-  function update() {
-    for (let x = 0; x < size; x++) {
-      for (let y = 0; y < size; y++) {
-        data[x][y].building?.update();
-      }
-    }
-  }
+  
 
   return {
     size,
-    data,
-    update
+    data
   }
 }
 
@@ -46,11 +42,12 @@ export function createCity(size) {
  * @param {number} y The y-coordinate of hte tile
  * @returns 
  */
-function createTile(x, y) {
+function createTile(x, y, z) {
   return { 
     x, 
     y,
+    z,
     terrainId: 'grass',
-    building: undefined
+    //building: undefined
   };
 }

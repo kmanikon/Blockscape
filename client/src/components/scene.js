@@ -1,69 +1,260 @@
 import * as THREE from 'three';
 import { createCamera } from './camera.js';
 import { createAssetInstance } from './assets.js';
+import { activeToolData } from './game.js';
 
-export function createScene() {
-  // Initial scene setup
+let selectedObject = undefined;
+let highlightedBlocks = [];
+let intersections = [];
+let terrain = [];
+
+let currentlyHighlightedBlock = null;
+let currentlyHighlightedFace = null;
+
+export function createScene(mode) {
   const gameWindow = document.getElementById('render-target');
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x777777);
+  //scene.background = new THREE.Color(mode === 'light' ? 0xFAFAFA : 0xACACAC);
 
   const camera = createCamera(gameWindow);
 
-  const renderer = new THREE.WebGLRenderer();
+  const renderer = new THREE.WebGLRenderer({ alpha: true });
+  renderer.setClearColor( 0x000000, 0 );
   renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
   gameWindow.appendChild(renderer.domElement);
-  
+
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
-  let selectedObject = undefined;
-
-  let terrain = [];
-  let buildings = [];
 
   let onObjectSelected = undefined;
 
   function initialize(city) {
     scene.clear();
     terrain = [];
-    buildings = [];
+    highlightedBlocks = [];
+
     for (let x = 0; x < city.size; x++) {
       const column = [];
       for (let y = 0; y < city.size; y++) {
-        const terrainId = city.data[x][y].terrainId;
-        const mesh = createAssetInstance(terrainId, x, y);
-        scene.add(mesh);
-        column.push(mesh);
+        const row = [];
+        for (let z = 0; z < city.size; z++) {
+          row.push(undefined);
+        }
+        column.push(row);
       }
       terrain.push(column);
-      buildings.push([...Array(city.size)]);
+    }
+
+    for (let x = 0; x < city.size; x++) {
+      for (let y = 0; y < city.size; y++) {
+        const terrainId = 'foundation';
+        const mesh = createAssetInstance(terrainId, x, 0, y);
+        scene.add(mesh);
+        terrain[x][0][y] = mesh;
+      }
     }
 
     setupLights();
   }
 
-  function update(city) {
-    for (let x = 0; x < city.size; x++) {
-      for (let y = 0; y < city.size; y++) {
-        const tile = city.data[x][y];
-        const existingBuildingMesh = buildings[x][y];
+  function boundVal (val, min, max) {
+    if (val < min){
+      return min;
+    }
+    if (val > max){
+      return max;
+    }
+    return val;
+  }
 
-        // If the player removes a building, remove it from the scene
-        if (!tile.building && existingBuildingMesh) {
-          scene.remove(existingBuildingMesh);
-          buildings[x][y] = undefined;
-        }
+  function isPlaceable(x, y, z) {
+    /*
+    if (terrain[x][y][z] && terrain[x][y][z].userData.id !== 'sky') {
+      return false;
+    }
+    */
 
-        // If the data model has changed, update the mesh
-        if (tile.building && tile.building.updated) {
-          scene.remove(existingBuildingMesh);
-          buildings[x][y] = createAssetInstance(tile.building.id, x, y, tile.building);
-          scene.add(buildings[x][y]);
-          tile.building.updated = false;
-        }
+    const neighbors = [
+      [x - 1, y, z], [x + 1, y, z],
+      [x, y - 1, z], [x, y + 1, z],
+      [x, y, z - 1], [x, y, z + 1]
+    ];
+
+    for (let [nx, ny, nz] of neighbors) {
+      if (nx >= 0 && nx < terrain.length &&
+        ny >= 0 && ny < terrain[0].length &&
+        nz >= 0 && nz < terrain[0][0].length
+        //terrain[nx][ny][nz] && terrain[nx][ny][nz].userData.id !== 'sky'
+      ) {
+        return true;
       }
     }
+    return false;
   }
+
+  function placeBlock(intersection) {
+    const intersectedBlock = intersection.object;
+    const normal = intersection.face.normal;
+    const x = intersectedBlock.userData.x + normal.x;
+    const y = intersectedBlock.userData.y + normal.y;
+    const z = intersectedBlock.userData.z + normal.z;
+
+    if (x >= 0 && x < terrain.length &&
+      y >= 0 && y < terrain[0].length &&
+      z >= 0 && z < terrain[0][0].length) {
+
+      if (terrain[x][y][z] !== undefined) {
+        scene.remove(terrain[x][y][z]);
+        terrain[x][y][z] = undefined;
+      }
+
+      const newBlock = createAssetInstance(activeToolData.id, x, y, z, { color: activeToolData.color });
+      scene.add(newBlock);
+      terrain[x][y][z] = newBlock;
+    }
+  }
+
+  function clearBlock(intersection) {
+    const intersectedBlock = intersection.object;
+    const normal = intersection.face.normal;
+    const x = intersectedBlock.userData.x + normal.x;
+    const y = intersectedBlock.userData.y + normal.y;
+    const z = intersectedBlock.userData.z + normal.z;
+
+    if (x >= 0 && x < terrain.length &&
+      y >= 0 && y < terrain[0].length &&
+      z >= 0 && z < terrain[0][0].length && 
+      isPlaceable(x, y, z)) {
+        scene.remove(intersectedBlock);
+        terrain[x][y][z] = undefined;
+      }
+  }
+
+
+/*
+  HIGHLIGHTING LOGIC HERE
+*/
+
+function placeHighlightBlock(intersection) {
+  const intersectedBlock = intersection.object;
+  const normal = intersection.face.normal;
+
+  let x = intersectedBlock.userData.x + Math.round(normal.x);
+  let y = intersectedBlock.userData.y + Math.round(normal.y);
+  let z = intersectedBlock.userData.z + Math.round(normal.z);
+
+  x = Math.max(0, Math.min(x, terrain.length - 1));
+  y = Math.max(0, Math.min(y, terrain[0].length - 1));
+  z = Math.max(0, Math.min(z, terrain[0][0].length - 1));
+
+  
+  // Check if we are still hovering over the same block and face
+  if (currentlyHighlightedBlock === intersectedBlock && currentlyHighlightedFace === normal) {
+    // No need to update highlight, the block and face are the same
+    return;
+  }
+  
+
+  // Update highlighted block and face tracking
+  currentlyHighlightedBlock = intersectedBlock;
+  currentlyHighlightedFace = normal;
+
+  // Clear existing highlights only if block/face has changed
+  clearHighlights();
+  
+  // Highlight adjacent faces as per the logic
+  highlightAdjacentFaces(x, y, z);
+}
+
+function clearHighlights() {
+  highlightedBlocks.forEach(highlight => {
+    scene.remove(highlight);
+  });
+  highlightedBlocks = [];
+  currentlyHighlightedBlock = null;
+  currentlyHighlightedFace = null;
+}
+
+function highlightAdjacentFaces(x, y, z) {
+  const adjacentPositions = [
+    {x: x-1, y: y, z: z, face: 'right'},
+    {x: x+1, y: y, z: z, face: 'left'},
+    {x: x, y: y-1, z: z, face: 'top'},
+    {x: x, y: y+1, z: z, face: 'bottom'},
+    {x: x, y: y, z: z-1, face: 'front'},
+    {x: x, y: y, z: z+1, face: 'back'}
+  ];
+
+  adjacentPositions.forEach(pos => {
+    if (isValidPosition(pos.x, pos.y, pos.z) && terrain[pos.x][pos.y][pos.z]) {
+      highlightBlockFace(terrain[pos.x][pos.y][pos.z], pos.face);
+    }
+  });
+}
+
+  function isValidPosition(x, y, z) {
+      return x >= 0 && x < terrain.length &&
+            y >= 0 && y < terrain[0].length &&
+            z >= 0 && z < terrain[0][0].length;
+  }
+
+  function highlightBlockFace(block, face) {
+    const highlightMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.2,
+      side: THREE.DoubleSide,
+      polygonOffset: true, // Avoid z-fighting
+      polygonOffsetFactor: -0.5,
+    });
+  
+    const highlightGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial);
+  
+    positionHighlight(highlightMesh, block, face);
+  
+    // Disable raycasting for this highlight mesh
+    highlightMesh.raycast = () => {};
+  
+    scene.add(highlightMesh);
+    highlightedBlocks.push(highlightMesh);
+  }
+
+  function positionHighlight(highlightMesh, block, face) {
+      highlightMesh.position.copy(block.position);
+
+      const offset = 0.500; // Slight offset to prevent z-fighting
+
+      
+      switch(face) {
+        case 'left':
+          highlightMesh.rotation.y = Math.PI / 2;
+          highlightMesh.position.x -= 0.5 + offset;
+          break;
+        case 'right':
+          highlightMesh.rotation.y = -Math.PI / 2;
+          highlightMesh.position.x += 0.5 + offset;
+          break;
+        case 'top':
+          highlightMesh.rotation.x = -Math.PI / 2;
+          highlightMesh.position.y += 0.5 + offset;
+          break;
+        case 'bottom':
+          highlightMesh.rotation.x = Math.PI / 2;
+          highlightMesh.position.y -= 0.5 + offset;
+          break;
+        case 'front':
+          highlightMesh.position.z += 0.5 + offset;
+          break;
+        case 'back':
+          highlightMesh.rotation.y = Math.PI;
+          highlightMesh.position.z -= 0.5 + offset;
+          break;
+      }
+      
+  }
+
+
 
   function setupLights() {
     const lights = [
@@ -80,67 +271,90 @@ export function createScene() {
     scene.add(...lights);
   }
 
-  /**
-   * Render the contents of the scene
-   */
   function draw() {
     renderer.render(scene, camera.camera);
   }
 
-  /**
-   * Starts the renderer
-   */
   function start() {
     renderer.setAnimationLoop(draw);
   }
 
-  /**
-   * Stops the renderer
-   */
   function stop() {
     renderer.setAnimationLoop(null);
   }
 
-  /**
-   * Event handler for `onMouseDown` event
-   * @param {MouseEvent} event 
-   */
   function onMouseDown(event) {
-    // Compute normalized mouse coordinates
-    mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
-    mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera.camera);
-
-    let intersections = raycaster.intersectObjects(scene.children, false);
-
     if (intersections.length > 0) {
-      if (selectedObject) selectedObject.material.emissive.setHex(0);
-      selectedObject = intersections[0].object;
-      selectedObject.material.emissive.setHex(0x555555);
-      console.log(selectedObject.userData);
-
-      if (this.onObjectSelected) {
-        this.onObjectSelected(selectedObject);
+      if (activeToolData.id !== 'bulldoze') {
+        placeBlock(intersections[0]);
+      }
+      else {
+        clearBlock(intersections[0]);
       }
     }
   }
 
-  /**
-   * Event handler for 'onMouseMove' event
-   * @param {MouseEvent} event 
-   */
   function onMouseMove(event) {
     camera.onMouseMove(event);
+  
+    mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+    mouse.y = -(event.clientY / (renderer.domElement.clientHeight + 100)) * 2 + 1;
+  
+    raycaster.setFromCamera(mouse, camera.camera);
+  
+    intersections = raycaster.intersectObjects(scene.children, false);
+  
+    
+    if (selectedObject) {
+      if (selectedObject?.material?.emissive) {
+        selectedObject.material.emissive.setHex(0);
+      }
+      if (selectedObject.userData.isTemporary) {
+        const x = selectedObject.userData.x;
+        const y = selectedObject.userData.y;
+        const z = selectedObject.userData.z;
+        terrain[x][z][y] = undefined;
+        scene.remove(selectedObject);
+      }
+      selectedObject = undefined;
+    }
+  
+
+    // start highlight logic:
+
+    if (activeToolData.id === '') {
+      return;
+    }
+    
+    if (intersections.length > 0 && intersections[0]?.object?.material) {
+      if (activeToolData.id === 'bulldoze') {
+        selectedObject = intersections[0].object;
+        if (selectedObject?.material?.emissive) {
+          selectedObject.material.emissive.setHex(0x555555);
+        }
+      } else {
+        
+
+        placeHighlightBlock(intersections[0]);
+       
+      }
+    }
+    else if (selectedObject){
+      selectedObject.material.emissive.setHex(0);
+    }
+    
+    
   }
+  
 
   return {
     onObjectSelected,
     initialize,
-    update,
     start,
     stop,
     onMouseDown,
-    onMouseMove
+    onMouseMove,
+    clearHighlights
   }
 }
+

@@ -10,7 +10,7 @@
 
 #ui-toolbar {
     position: absolute;
-    width: 150px;
+    width: 100px;
     height: calc(100vh - 32px);
     padding: 16px;
     background-color: #00000033;
@@ -34,3 +34,28 @@
   .ui-button:not(.selected):hover {
     background-color: #33333355;
   }
+
+.my-button {
+  color: red;
+}
+
+.sidebar-clickable {
+  margin-left: -20px !important;
+}
+
+.sidebar-text {
+  padding-left: 10px;
+}
+
+
+.MuiDrawer-paper {
+  max-width: 180px !important;
+  min-width: 75px !important;
+}
+
+
+
+.no-click {
+  pointer-events: none !important;
+}
+  
