@@ -11,14 +11,75 @@ let terrain = [];
 let currentlyHighlightedBlock = null;
 let currentlyHighlightedFace = null;
 
+let citySize;
+
+let gameWindow;
+let scene;
+let camera;
+let renderer;
+
+export function handleClearAll() {
+
+  // clear logic here 
+  selectedObject = undefined;
+  highlightedBlocks = [];
+  intersections = [];
+  terrain = [];
+
+  currentlyHighlightedBlock = null;
+  currentlyHighlightedFace = null;
+  
+
+  scene.clear();
+  terrain = [];
+  highlightedBlocks = [];
+
+  for (let x = 0; x < citySize; x++) {
+    const column = [];
+    for (let y = 0; y < citySize; y++) {
+      const row = [];
+      for (let z = 0; z < citySize; z++) {
+        row.push(undefined);
+      }
+      column.push(row);
+    }
+    terrain.push(column);
+  }
+
+  for (let x = 0; x < citySize; x++) {
+    for (let y = 0; y < citySize; y++) {
+      const terrainId = 'foundation';
+      const mesh = createAssetInstance(terrainId, x, 0, y);
+      scene.add(mesh);
+      terrain[x][0][y] = mesh;
+    }
+  }
+
+
+
+  // setup lights
+  const lights = [
+    new THREE.AmbientLight(0xffffff, 0.2),
+    new THREE.DirectionalLight(0xffffff, 0.3),
+    new THREE.DirectionalLight(0xffffff, 0.3),
+    new THREE.DirectionalLight(0xffffff, 0.3)
+  ];
+
+  lights[1].position.set(0, 1, 0);
+  lights[2].position.set(1, 1, 0);
+  lights[3].position.set(0, 1, 1);
+
+  scene.add(...lights);
+}
+
 export function createScene(mode) {
-  const gameWindow = document.getElementById('render-target');
-  const scene = new THREE.Scene();
+  gameWindow = document.getElementById('render-target');
+  scene = new THREE.Scene();
   //scene.background = new THREE.Color(mode === 'light' ? 0xFAFAFA : 0xACACAC);
 
-  const camera = createCamera(gameWindow);
+  camera = createCamera(gameWindow);
 
-  const renderer = new THREE.WebGLRenderer({ alpha: true });
+  renderer = new THREE.WebGLRenderer({ alpha: true });
   renderer.setClearColor( 0x000000, 0 );
   renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
   gameWindow.appendChild(renderer.domElement);
@@ -32,6 +93,8 @@ export function createScene(mode) {
     scene.clear();
     terrain = [];
     highlightedBlocks = [];
+
+    citySize = city.size;
 
     for (let x = 0; x < city.size; x++) {
       const column = [];
