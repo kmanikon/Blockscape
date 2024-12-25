@@ -121,6 +121,9 @@ export function createScene(mode) {
     const y = intersectedBlock.userData.y + normal.y;
     const z = intersectedBlock.userData.z + normal.z;
 
+    if (selectedObject.userData.id === 'foundation') {
+      return;
+    }
     if (x >= 0 && x < terrain.length &&
       y >= 0 && y < terrain[0].length &&
       z >= 0 && z < terrain[0][0].length && 
@@ -286,6 +289,7 @@ function highlightAdjacentFaces(x, y, z) {
   function onMouseDown(event) {
     if (intersections.length > 0) {
       if (activeToolData.id !== 'bulldoze') {
+        //clearHighlights();
         placeBlock(intersections[0]);
       }
       else {
@@ -298,7 +302,7 @@ function highlightAdjacentFaces(x, y, z) {
     camera.onMouseMove(event);
   
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
-    mouse.y = -(event.clientY / (renderer.domElement.clientHeight + 100)) * 2 + 1;
+    mouse.y = -(event.clientY / (renderer.domElement.clientHeight + 27.5)) * 2 + 1;
   
     raycaster.setFromCamera(mouse, camera.camera);
   
@@ -334,7 +338,6 @@ function highlightAdjacentFaces(x, y, z) {
         }
       } else {
         
-
         placeHighlightBlock(intersections[0]);
        
       }

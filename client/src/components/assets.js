@@ -23,7 +23,7 @@ const assets = {
     return mesh;
   },
   'foundation': (x, y, z) => {
-    const material = new THREE.MeshLambertMaterial({ color: 0x2C2C2C });
+    const material = new THREE.MeshLambertMaterial({ color: 0x504350 });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.userData = { id: 'foundation', x, y, z };
     mesh.position.set(x, y, z);

@@ -1,125 +1,57 @@
-import { useState, useEffect, useRef } from 'react';
-
+import React, { useState, useEffect, useRef } from 'react';
 import { createGame, setActiveToolData } from './components/game.js';
-
 import CubeSvg from './components/CubeSvg';
 import ClearCubeSvg from './components/ClearCubeSvg';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { createTheme } from '@mui/material/styles';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import {
+  AppBar,
+  Toolbar,
+  Drawer,
+  Box,
+  Typography,
+  CssBaseline,
+  Divider,
+  IconButton,
+  Button,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
+import { styled, useTheme, createTheme, ThemeProvider } from '@mui/material/styles';
+import MenuIcon from '@mui/icons-material/Menu';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
-import { AppProvider } from '@toolpad/core/AppProvider';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import Button from '@mui/material/Button';
-import MainLogo from './assets/yellow_cube.png';
-
-import { Router, Navigation } from '@toolpad/core';
 
 import './App.css';
 
+const drawerWidth = 240;
+
 const colorPalette = [
-  "#FF6F61",  // Coral
-  "#6B5B95",  // Royal Purple
-  "#88B04B",  // Soft Green
-  "#92A8D1",  // Light Blue
-  "#DD4124",  // Fiery Red
-  "#EFC050",  // Golden Yellow
-  "#009B77",  // Emerald
-  "#B565A7",  // Orchid
-  "#9B2335",  // Crimson
-  "#45B8AC",  // Aqua
-  "#BC243C",  // Claret
-  "#5B5EA6",  // Indigo
-  "#955251",  // Chestnut
-  "#F7CAC9",  // Pale Pink
-  "#F3D6E4"   // Blush
+  "#FF6F61", "#6B5B95", "#88B04B", "#92A8D1", "#DD4124", "#EFC050",
+  "#009B77", "#B565A7", "#9B2335", "#45B8AC", "#BC243C", "#5B5EA6",
+  "#955251", "#F7CAC9", "#F3D6E4"
 ];
 
-/*
-const NAVIGATION = [
-  {
-    kind: 'header',
-    title: 'Main items',
-  },
-  {
-    kind: 'title',
-    segment: 'None',
-    title: 'Reports',
-    icon: <BarChartIcon />,
-    //action: () => null
-    //render: <div onClick={() => null}>hi</div>
-    
-  },
-  {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-  {
-    kind: 'divider',
-  },
-  {
-    kind: 'header',
-    title: 
-      <Button 
-        className="sidebar-clickable"
-        fullWidth
-        style={{padding: 0, justifyContent: 'left'}}
-      >
-        <CubeSvg cubeColor="blue"/>
-        <div className="sidebar-text">
-        hi
-        </div>
-      </Button>
-  },
-  {
-    kind: 'header',
-    title: 
-      <Button 
-        className="sidebar-clickable"
-        fullWidth
-        style={{padding: 0, justifyContent: 'left'}}
-      >
-        <CubeSvg cubeColor="blue"/>
-        <div className="sidebar-text">
-        hi
-        </div>
-      </Button>
-  },
-  {
-    segment: 'reports',
-    title: 'Reports',
-    icon: <BarChartIcon />,
-    disabled: true,
-    children: [
-      {
-        segment: 'sales',
-        title: 'Sales',
-        icon: <DescriptionIcon />,
-      },
-      {
-        segment: 'traffic',
-        title: 'Traffic',
-        icon: <DescriptionIcon />,
-      },
-    ],
-  },
-  {
-    segment: 'integrations',
-    title: 'Integrations',
-    icon: <LayersIcon />,
-  },
-];
-*/
-
-
+const darkmode = {
+  navbar: '#222222',
+  offWhiteText: '#F5F5F5',
+  drawerBackground: '#2B2B2B',
+  drawerSelect: '#444444',
+  drawerHightlight: '#333333',
+  scrollThumb: '#666666',
+  scrollBackground: '#333333'
+}
 
 function App() {
   const refContainer = useRef(null);
+  const theme = useTheme();
+  const [open, setOpen] = useState(true);
+  const [selectedColor, setSelectedColor] = useState();
+
 
   useEffect(() => {
     if (refContainer.current) {
@@ -127,146 +59,117 @@ function App() {
         refContainer.current.removeChild(refContainer.current.firstChild);
       }
     }
-
     window.game = createGame('dark');
-
   }, []);
 
-
   const swapTool = (toolId, toolColor) => {
-    const newTool = { id: toolId, color: toolColor || 0x000000 }
-    setActiveToolData(newTool)
+    const newTool = { id: toolId, color: toolColor || 0x000000 };
+    setActiveToolData(newTool);
+    setSelectedColor(toolColor || 'clear');
     window.game.clearHighlights();
-  }
+  };
 
-  const demoTheme = createTheme({
-    cssVariables: {
-      colorSchemeSelector: 'data-toolpad-color-scheme',
-    },
-    colorSchemes: {
-      light: {
-        palette: {
-          background: {
-            default: '#f5f5f5', // Light grey for the overall layout
-          },
-        },
-      },
-      dark: {
-        palette: {
-          background: {
-            default: '#ECECEC', // Light grey for the overall layout
-          },
-        },
-      },
-    },
-    breakpoints: {
-      values: {
-        xs: 0,
-        sm: 600,
-        md: 600,
-        lg: 1200,
-        xl: 1536,
-      },
-    },
-  });
-
-  const clearBlock = [{
-    kind: 'title',
-    segment: 'None',
-    title: <div onClick={() => swapTool('bulldoze')}>Clear</div>,
-    icon: 
-      <Button 
-        className="sidebar-clickable"
-        fullWidth
-        onClick={() => swapTool('bulldoze')}
-        disableRipple
-        disableElevation
-        sx={{
-          ml: 1,
-          "&.MuiButtonBase-root:hover": {
-            bgcolor: "transparent"
-          }
-        }}
-      >
-        <ClearCubeSvg/>
-
-      </Button>,
-   
-  }]
-
-
-  const colorBlocks = colorPalette.map((color) => (
-   {
-    kind: 'title',
-    segment: 'None',
-    title: <div onClick={() => swapTool('player_block', color)}>{color}</div>,
-    icon: 
-      <Button 
-        className="sidebar-clickable"
-        fullWidth
-        onClick={() => swapTool('player_block', color)}
-        disableRipple
-        disableElevation
-        sx={{
-          ml: 1,
-          "&.MuiButtonBase-root:hover": {
-            bgcolor: "transparent"
-          }
-        }}
-      >
-        <CubeSvg cubeColor={color}/>
-
-      </Button>,
-   }
-  
-  ))
-  
+  const handleDrawerToggle = () => setOpen(!open);
+  //const handleDrawerClose = () => setOpen(false);
 
   return (
-    <div>
-        {/* main section*/}
-        {/*}
-        <div id="render-target" ref={refContainer} style={{ width: 'calc(100vw)', height: '100vh', float: 'right', zIndex: -1 }}>
-        </div>
-      
-        <div id="ui-toolbar">
-            {colorPalette.map((color) => 
-              <div style={{display: 'flex'}}>
-                <CubeSvg cubeColor={color}/>
-                glgr
-              </div>
-            )}
-            <button id='button-bulldoze' className="ui-button selected" onClick={() => swapTool('bulldoze') }>CLEAR</button>
-            <button id='button-residential' className="ui-button" onClick={() => swapTool('player_block', 0x008000) }>GREEN</button>
-            <button id='button-commercial' className="ui-button" onClick={() => swapTool('player_block', 0x0000FF)}>BLUE</button>
-            <button id='button-industrial' className="ui-button" onClick={() => swapTool('player_block', 0xFFFF00)}>YELLOW</button>
-            <button id='button-industrial' className="ui-button" onClick={() => swapTool('player_block', 0x00000A)}>BLACK</button>
-        </div>
-        */}
-        <AppProvider
-          navigation={[
-            ...clearBlock,
-            ...colorBlocks,
-          ]}  // Pass an empty array instead of NAVIGATION
-          theme={demoTheme}
-          //sidebar={false}  // Set sidebar to false to attempt to hide it
-          branding={{
-            //kind: 'header',
-            title: '3D Sandbox',
-            //logo: <img src={MainLogo} style={{paddingRight: 5}}/>
-          }}
-          router={{
-            navigate: () => null
-          }}
-      >
-        <DashboardLayout>
-        </DashboardLayout>
+    <>
 
-        <div id="render-target" ref={refContainer} style={{ width: 'calc(100vw)', height: 'calc(100vh - 65px)', float: 'right', zIndex: -1 }}>
+      <AppBar position="fixed" sx={{ boxShadow: 'none' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: darkmode.navbar,
+            height: 55,
+            paddingLeft: 20
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerToggle}
+              edge="start"
+              sx={{ marginRight: 2 }}
+            >
+              <MenuIcon />
+              {open ?
+                <ChevronLeftIcon />
+                :
+                <ChevronRightIcon />
+              }
+            </IconButton>
+
+            <CubeSvg cubeColor={'#92a8d1'} />
+
+            <Typography variant="h6" noWrap style={{ fontWeight: 560, marginLeft: 15 }}>
+              3D Sandbox
+            </Typography>
+          </div>
         </div>
-        
-      </AppProvider>
-    </div>
+      </AppBar>
+
+
+
+
+
+      <Drawer
+        sx={{
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            height: 'calc(100vh - 55px)',
+            marginTop: '55px',
+            color: darkmode.offWhiteText,
+            backgroundColor: darkmode.drawerBackground, // Drawer background
+            // Customizing the scrollbar to match the background while keeping it visible
+            '&::-webkit-scrollbar': {
+              width: '8px', // Scrollbar width
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: darkmode.scrollThumb, // Scrollbar thumb color, lighter shade to remain visible
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: darkmode.scrollBackground, // Match the drawer background color for track
+            },
+          },
+        }}
+        variant="persistent"
+        open={open}
+      >
+
+        <List style={{ padding: 0, margin: 5 }}>
+          <ListItem disablePadding>
+            <ListItemButton onClick={() => swapTool('bulldoze')} style={{ backgroundColor: selectedColor === 'clear' ? darkmode.drawerSelect : 'transparent' }}>
+              <ListItemIcon>
+                <ClearCubeSvg />
+              </ListItemIcon>
+              <ListItemText primary="Clear" />
+            </ListItemButton>
+          </ListItem>
+          {colorPalette.map((color, index) => (
+            <ListItem key={index} disablePadding>
+              <ListItemButton onClick={() => swapTool('player_block', color)} style={{ backgroundColor: selectedColor === color ? darkmode.drawerSelect : 'transparent' }}>
+                <ListItemIcon>
+                  <CubeSvg cubeColor={color} />
+                </ListItemIcon>
+                <ListItemText primary={color} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+      </Drawer>
+
+
+
+
+      <div id="render-target" ref={refContainer} style={{ width: 'calc(100vw)', height: 'calc(100vh - 55px)', float: 'right', zIndex: -1, marginTop: 27.5 }}>
+      </div>
+    </>
   );
 }
 
