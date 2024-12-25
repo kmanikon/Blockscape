@@ -60,6 +60,17 @@ export function createCamera(gameWindow) {
     }
   }
 
+  // Scroll event handler for zooming
+  function onMouseWheel(event) {
+    const delta = event.deltaY || event.detail || -event.wheelDelta;
+    cameraRadius += delta * ZOOM_SENSITIVITY;
+
+    // Clamping zoom limits
+    cameraRadius = Math.min(MAX_CAMERA_RADIUS, Math.max(MIN_CAMERA_RADIUS, cameraRadius));
+
+    updateCameraPosition();
+  }
+
   function updateCameraPosition() {
     camera.position.x = cameraRadius * Math.sin(cameraAzimuth * DEG2RAD) * Math.cos(cameraElevation * DEG2RAD);
     camera.position.y = cameraRadius * Math.sin(cameraElevation * DEG2RAD);
@@ -71,6 +82,7 @@ export function createCamera(gameWindow) {
 
   return {
     camera,
-    onMouseMove
+    onMouseMove,
+    onMouseWheel
   }
 }

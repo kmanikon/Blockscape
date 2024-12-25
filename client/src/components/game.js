@@ -23,6 +23,7 @@ export function createGame(mode) {
   // Hook up mouse event handlers to the scene
   document.addEventListener('mousedown', scene.onMouseDown.bind(scene), false);
   document.addEventListener('mousemove', scene.onMouseMove.bind(scene), false);
+  document.addEventListener('wheel', scene.onMouseWheel.bind(scene), false);
   document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
 
 

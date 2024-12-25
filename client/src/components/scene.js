@@ -21,6 +21,8 @@ let renderer;
 export function handleClearAll() {
 
   // clear logic here 
+
+  // reset vars
   selectedObject = undefined;
   highlightedBlocks = [];
   intersections = [];
@@ -30,6 +32,7 @@ export function handleClearAll() {
   currentlyHighlightedFace = null;
   
 
+  // initialize
   scene.clear();
   terrain = [];
   highlightedBlocks = [];
@@ -54,7 +57,6 @@ export function handleClearAll() {
       terrain[x][0][y] = mesh;
     }
   }
-
 
 
   // setup lights
@@ -361,6 +363,12 @@ function highlightAdjacentFaces(x, y, z) {
     }
   }
 
+  // Scroll event listener for zooming in and out
+  function onMouseWheel(event) {
+    
+    camera.onMouseWheel(event);
+  }
+
   function onMouseMove(event) {
     camera.onMouseMove(event);
   
@@ -419,6 +427,7 @@ function highlightAdjacentFaces(x, y, z) {
     start,
     stop,
     onMouseDown,
+    onMouseWheel,
     onMouseMove,
     clearHighlights
   }
