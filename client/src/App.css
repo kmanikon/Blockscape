@@ -54,6 +54,13 @@
 }
 
 
+.drawer-button {
+  transition: background-color 0.2s;
+}
+
+.drawer-button:hover {
+  background-color: #333333;
+}
 
 .no-click {
   pointer-events: none !important;

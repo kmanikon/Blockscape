@@ -28,6 +28,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import LayersIcon from '@mui/icons-material/Layers';
 
+import wasd from './assets/wasd.png';
+
 import './App.css';
 
 const drawerWidth = 240;
@@ -144,7 +146,7 @@ function App() {
         >
 
           <List style={{ padding: 0, margin: 5 }}>
-            <ListItem disablePadding>
+            <ListItem disablePadding className="drawer-button">
               <ListItemButton onClick={() => swapTool('bulldoze')} style={{ backgroundColor: selectedColor === 'clear' ? darkmode.drawerSelect : 'transparent' }}>
                 <ListItemIcon>
                   <ClearCubeSvg />
@@ -153,7 +155,7 @@ function App() {
               </ListItemButton>
             </ListItem>
             {colorPalette.map((color, index) => (
-              <ListItem key={index} disablePadding>
+              <ListItem key={index} disablePadding className="drawer-button">
                 <ListItemButton onClick={() => swapTool('player_block', color)} style={{ backgroundColor: selectedColor === color ? darkmode.drawerSelect : 'transparent' }}>
                   <ListItemIcon>
                     <CubeSvg cubeColor={color} />
@@ -178,20 +180,33 @@ function App() {
             loadingPosition="start"
             variant="outlined"
             onClick={handleClearAll}
-            style={{height: 30}}
+            style={{height: 30 }}
           >
             <HighlightOffIcon style={{marginRight: 10}}/>
             <div>
               Clear All
             </div>
+            
           </Button>
+        </div>
+        <div 
+          style={{
+            position: 'absolute',
+            bottom: 40,
+            marginTop: 70,
+            marginLeft: open ? 240 : 60,
+            transition: 'margin-left 0.175s ease', // Transition for the button
+            //backgroundColor: 'transparent'
+          }}
+        >
+          <img src={wasd} style={{width: 120, height: 120}}/>
         </div>
       </div>
 
 
 
 
-      <div id="render-target" ref={refContainer} style={{ width: 'calc(100vw)', height: 'calc(100vh - 55px)', float: 'right', zIndex: -1, marginTop: 27.5 }}>
+      <div id="render-target" ref={refContainer} style={{ width: 'calc(100vw)', height: 'calc(100vh - 55px)', float: 'right', zIndex: -1, marginTop: 55 }}>
       </div>
     </>
   );
