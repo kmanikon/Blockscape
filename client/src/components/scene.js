@@ -373,7 +373,7 @@ function highlightAdjacentFaces(x, y, z) {
     camera.onMouseMove(event);
   
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
-    mouse.y = -(event.clientY / (renderer.domElement.clientHeight + 27.5)) * 2 + 1;
+    mouse.y = -(event.clientY / (renderer.domElement.clientHeight + 55)) * 2 + 1;
   
     raycaster.setFromCamera(mouse, camera.camera);
   
