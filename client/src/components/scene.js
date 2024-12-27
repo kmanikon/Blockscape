@@ -230,10 +230,28 @@ function placeHighlightBlock(intersection) {
   // Clear existing highlights only if block/face has changed
   clearHighlights();
   
-  // Highlight adjacent faces as per the logic
-  highlightAdjacentFaces(x, y, z);
+  if (y > 0){
+    // Highlight adjacent faces as per the logic
+    highlightAdjacentFaces(x, y, z);
+  }
 }
 
+function clearHighlights() {
+  highlightedBlocks.forEach(highlight => {
+    //animateScale(highlight, { x: 0.5, y: 0.5, z: 0.5 }, 10); // Shrink before removal
+    /*
+    setTimeout(() => {
+      scene.remove(highlight);
+    }, 100);
+    */
+    scene.remove(highlight);
+  });
+  highlightedBlocks = [];
+  currentlyHighlightedBlock = null;
+  currentlyHighlightedFace = null;
+}
+
+/*
 function clearHighlights() {
   highlightedBlocks.forEach(highlight => {
     scene.remove(highlight);
@@ -242,6 +260,7 @@ function clearHighlights() {
   currentlyHighlightedBlock = null;
   currentlyHighlightedFace = null;
 }
+*/
 
 function highlightAdjacentFaces(x, y, z) {
   const adjacentPositions = [
@@ -266,6 +285,54 @@ function highlightAdjacentFaces(x, y, z) {
             z >= 0 && z < terrain[0][0].length;
   }
 
+  function animateScale(mesh, targetScale, duration) {
+    const startTime = performance.now();
+    //const startScale = { x: mesh.scale.x, y: mesh.scale.y, z: mesh.scale.z };
+    const startScale = { x: 0.75, y: 0.75, z: 0.75 }
+
+    function animate() {
+      const elapsedTime = performance.now() - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+  
+      mesh.scale.x = startScale.x + (targetScale.x - startScale.x) * progress;
+      mesh.scale.y = startScale.y + (targetScale.y - startScale.y) * progress;
+      mesh.scale.z = startScale.z + (targetScale.z - startScale.z) * progress;
+  
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    }
+  
+    animate();
+  }
+  
+  function highlightBlockFace(block, face) {
+    const highlightMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.1,
+      side: THREE.DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -0.5,
+    });
+  
+    const highlightGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial);
+  
+    positionHighlight(highlightMesh, block, face);
+  
+    // Disable raycasting for this highlight mesh
+    highlightMesh.raycast = () => {};
+  
+    //animateScale(highlightMesh, { x: 1, y: 1, z: 1 }, 50); // 300ms duration
+
+    scene.add(highlightMesh);
+    highlightedBlocks.push(highlightMesh);
+      
+  }
+  
+
+  /*
   function highlightBlockFace(block, face) {
     const highlightMaterial = new THREE.MeshBasicMaterial({
       color: 0xffffff,
@@ -287,6 +354,7 @@ function highlightAdjacentFaces(x, y, z) {
     scene.add(highlightMesh);
     highlightedBlocks.push(highlightMesh);
   }
+  */
 
   function positionHighlight(highlightMesh, block, face) {
       highlightMesh.position.copy(block.position);
@@ -354,7 +422,7 @@ function highlightAdjacentFaces(x, y, z) {
   function onMouseDown(event) {
     if (intersections.length > 0) {
       if (activeToolData.id !== 'bulldoze') {
-        //clearHighlights();
+        clearHighlights();
         placeBlock(intersections[0]);
       }
       else {
