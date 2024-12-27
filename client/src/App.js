@@ -145,7 +145,12 @@ function App() {
           open={open}
         >
 
-          <List style={{ padding: 0, margin: 5 }}>
+          <List 
+            onWheel={(event) => {
+              event.stopPropagation();
+            }}
+            style={{ padding: 0, margin: 5 }}
+          >
             <ListItem disablePadding className="drawer-button">
               <ListItemButton onClick={() => swapTool('bulldoze')} style={{ backgroundColor: selectedColor === 'clear' ? darkmode.drawerSelect : 'transparent' }}>
                 <ListItemIcon>
