@@ -58,6 +58,8 @@ export function handleClearAll() {
     }
   }
 
+  localStorage.removeItem('terrain');
+
 
   // setup lights
   const lights = [
@@ -97,6 +99,46 @@ export function createScene(mode) {
     highlightedBlocks = [];
 
     citySize = city.size;
+
+    
+    const cachedTerrain = localStorage.getItem('terrain');
+
+    if (cachedTerrain) {
+      const parsedTerrain = JSON.parse(cachedTerrain);
+      terrain = parsedTerrain;
+      const size = terrain.length;
+
+      
+      for (let x = 0; x < size; x++) {
+        for (let y = 0; y < size; y++) {
+          for (let z = 0; z < size; z++) {
+            const terrainId = terrain[x][z][y]?.object?.userData?.id;
+            
+            if (terrainId) {
+              if (terrainId === 'foundation') {
+                const mesh = createAssetInstance('foundation', x, z, y);
+                scene.add(mesh)
+                terrain[x][z][y] = mesh;
+              }
+              else {
+                const mesh = createAssetInstance(terrainId, x, z, y, { color: terrain[x][z][y].materials[0].color});
+                scene.add(mesh)
+                terrain[x][z][y] = mesh;
+              }
+            }
+            else {
+              terrain[x][z][y] = undefined;
+            }
+          }
+        }
+      }
+      
+      setupLights();
+
+      return;
+      
+    }
+    
 
     for (let x = 0; x < city.size; x++) {
       const column = [];
@@ -176,6 +218,9 @@ export function createScene(mode) {
       const newBlock = createAssetInstance(activeToolData.id, x, y, z, { color: activeToolData.color });
       scene.add(newBlock);
       terrain[x][y][z] = newBlock;
+
+      const terrainString = JSON.stringify(terrain);
+      localStorage.setItem('terrain', terrainString);
     }
   }
 
@@ -194,7 +239,10 @@ export function createScene(mode) {
       z >= 0 && z < terrain[0][0].length && 
       isPlaceable(x, y, z)) {
         scene.remove(intersectedBlock);
-        terrain[x][y][z] = undefined;
+        terrain[selectedObject.userData.x][selectedObject.userData.y][selectedObject.userData.z] = undefined;
+
+        const terrainString = JSON.stringify(terrain);
+        localStorage.setItem('terrain', terrainString); 
       }
   }
 
