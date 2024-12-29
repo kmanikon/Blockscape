@@ -211,7 +211,7 @@ function App() {
 
 
 
-      <div id="render-target" ref={refContainer} style={{ width: 'calc(100vw)', height: 'calc(100vh)', float: 'right', zIndex: -1}}>
+      <div id="render-target" ref={refContainer} style={{ position: 'absolute', width: 'calc(100vw)', height: 'calc(100vh)', float: 'right', zIndex: -1}}>
       </div>
     </>
   );
