@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createGame, setActiveToolData } from './components/game.js';
-import { handleClearAll } from './components/scene.js';
-import CubeSvg from './components/CubeSvg';
-import ClearCubeSvg from './components/ClearCubeSvg';
+import { createGame, setActiveToolData } from './components/three/game.js';
+import { handleClearAll } from './components/three/scene.js';
+import CubeSvg from './components/svg/CubeSvg.jsx';
+import ClearCubeSvg from './components/svg/ClearCubeSvg.jsx';
 import {
   AppBar,
   Toolbar,
   Drawer,
   Box,
   Typography,
-  CssBaseline,
   Divider,
   IconButton,
   Button,
@@ -18,15 +17,20 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Modal,
+  Paper,
+  TextField
 } from '@mui/material';
-import { styled, useTheme, createTheme, ThemeProvider } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import LayersIcon from '@mui/icons-material/Layers';
+import AddIcon from '@mui/icons-material/Add';
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { getProjects } from './api/supabase.js';
 
 import wasd from './assets/wasd.png';
 
@@ -47,15 +51,30 @@ const darkmode = {
   drawerSelect: '#444444',
   drawerHightlight: '#333333',
   scrollThumb: '#666666',
-  scrollBackground: '#333333'
+  scrollBackground: '#333333',
+  buttonAccent: 'rgba(240, 244, 248, 0.6)'
 }
 
 function App() {
   const refContainer = useRef(null);
   const theme = useTheme();
-  const [open, setOpen] = useState(true);
+  const [leftDrawerOpen, setLeftDrawerOpen] = useState(true);
+  const [rightDrawerOpen, setRightDrawerOpen] = useState(true);
   const [selectedColor, setSelectedColor] = useState();
 
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(1);
+
+  const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const projectData = await getProjects();
+      console.log(projectData)
+      setProjects(projectData);
+    }
+    fetchProjects();
+  }, []);
 
   useEffect(() => {
     if (refContainer.current) {
@@ -73,13 +92,33 @@ function App() {
     window.game.clearHighlights();
   };
 
-  const handleDrawerToggle = () => setOpen(!open);
+  const handleLeftDrawerToggle = () => setLeftDrawerOpen(!leftDrawerOpen);
+  const handleRightDrawerToggle = () => setRightDrawerOpen(!rightDrawerOpen);
   //const handleDrawerClose = () => setOpen(false);
+
+  const handleNewProjctModalClose = () => setNewProjectModalOpen(!newProjectModalOpen);
 
   return (
     <>
 
-      <AppBar position="fixed" sx={{ boxShadow: 'none' }}>
+      <AppBar 
+        position="fixed" 
+        sx={{ boxShadow: 'none' }} 
+        
+        onMouseDown={(event) => {
+          event.stopPropagation();
+        }}
+        onMouseMove={(event) => {
+          event.stopPropagation();
+        }}
+        onWheel={(event) => {
+          event.stopPropagation();
+        }}
+        onContextMenu={(event) => {
+          event.stopPropagation();
+        }}
+        
+      >
         <div
           style={{
             display: 'flex',
@@ -91,26 +130,44 @@ function App() {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton
+            <Button
               color="inherit"
               aria-label="open drawer"
-              onClick={handleDrawerToggle}
+              onClick={handleLeftDrawerToggle}
               edge="start"
               sx={{ marginRight: 2 }}
             >
               <MenuIcon />
-              {open ?
+              {leftDrawerOpen ?
                 <ChevronLeftIcon />
                 :
                 <ChevronRightIcon />
               }
-            </IconButton>
+            </Button>
 
             <CubeSvg cubeColor={'#92a8d1'} />
 
             <Typography variant="h6" noWrap style={{ fontWeight: 560, marginLeft: 15 }}>
               3D Sandbox
             </Typography>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Button
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleRightDrawerToggle}
+              edge="start"
+              sx={{ marginRight: 6 }}
+              style={{textTransform: 'none', backgroundColor: 'transparent'}}
+            >
+              <MenuIcon/>
+              <Typography variant="h6" noWrap style={{ fontWeight: 560, marginLeft: 15, fontSize: 17 }}>
+                Projects
+              </Typography>
+              
+            </Button>
+           
           </div>
         </div>
       </AppBar>
@@ -119,6 +176,7 @@ function App() {
 
 
       <div style={{ display: 'flex' }}>
+        {/* left drawer */}
         <Drawer
           sx={{
             flexShrink: 0,
@@ -142,21 +200,34 @@ function App() {
             },
           }}
           variant="persistent"
-          open={open}
+          open={leftDrawerOpen}
+
+          onMouseDown={(event) => {
+            event.stopPropagation();
+          }}
+          onMouseMove={(event) => {
+            event.stopPropagation();
+          }}
+          onWheel={(event) => {
+            event.stopPropagation();
+          }}
+          onContextMenu={(event) => {
+            event.stopPropagation();
+          }}
         >
 
           <List 
             onWheel={(event) => {
               event.stopPropagation();
             }}
-            style={{ padding: 0, margin: 5 }}
+            style={{ padding: 0, margin: 5, borderTop: `1px solid ${darkmode.drawerSelect}`, paddinTop: 5 }}
           >
             <ListItem disablePadding className="drawer-button">
               <ListItemButton onClick={() => swapTool('bulldoze')} style={{ backgroundColor: selectedColor === 'clear' ? darkmode.drawerSelect : 'transparent' }}>
                 <ListItemIcon>
                   <ClearCubeSvg />
                 </ListItemIcon>
-                <ListItemText primary="Clear" />
+                <div style={{fontSize: 15, fontWeight: 600}}>Clear</div>
               </ListItemButton>
             </ListItem>
             {colorPalette.map((color, index) => (
@@ -165,24 +236,91 @@ function App() {
                   <ListItemIcon>
                     <CubeSvg cubeColor={color} />
                   </ListItemIcon>
-                  <ListItemText primary={color} />
+                  <div style={{fontSize: 15, fontWeight: 600}}>{color}</div>
                 </ListItemButton>
               </ListItem>
             ))}
           </List>
           <Divider />
         </Drawer>
+
+        {/* right drawer */}
+        <Drawer
+          anchor="right"
+          sx={{
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              height: 'calc(100vh - 40px)',
+              marginTop: '55px',
+              color: darkmode.offWhiteText,
+              backgroundColor: darkmode.drawerBackground, // Drawer background
+              // Customizing the scrollbar to match the background while keeping it visible
+              '&::-webkit-scrollbar': {
+                width: '8px', // Scrollbar width
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: darkmode.scrollThumb, // Scrollbar thumb color, lighter shade to remain visible
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-track': {
+                backgroundColor: darkmode.scrollBackground, // Match the drawer background color for track
+              },
+            },
+          }}
+          variant="persistent"
+          open={rightDrawerOpen}
+
+          onMouseDown={(event) => {
+            event.stopPropagation();
+          }}
+          onMouseMove={(event) => {
+            event.stopPropagation();
+          }}
+          onWheel={(event) => {
+            event.stopPropagation();
+          }}
+          onContextMenu={(event) => {
+            event.stopPropagation();
+          }}
+        >
+          <List 
+            onWheel={(event) => {
+              event.stopPropagation();
+            }}
+            style={{width: '100%', padding: 0, margin: 5, borderTop: `1px solid ${darkmode.drawerSelect}`, paddingTop: 5 }}
+          >
+            <ListItem disablePadding className="drawer-button">
+              <ListItemButton style={{ backgroundColor: 'transparent' }} onClick={() => setNewProjectModalOpen(true)}>
+                <AddIcon style={{color: darkmode.buttonAccent, marginRight: 16}}/>
+                <div style={{fontSize: 14, fontWeight: 600}}>New Project</div>
+
+              </ListItemButton>
+            </ListItem>
+            
+            {projects.map((project, index) => (
+              <ListItem key={index} disablePadding className="drawer-button" style={{marginTop: 5}}>
+                <ListItemButton style={{ backgroundColor: selectedProject === project.id ? darkmode.drawerSelect : 'transparent' }}>
+                  <ArticleOutlinedIcon style={{color: darkmode.buttonAccent, marginRight: 16}}/>
+                  <div style={{fontSize: 14, fontWeight: 600, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{project.name}</div>
+                  <EditOutlinedIcon style={{ paddingLeft: 12, color: darkmode.buttonAccent, fontSize: 18, display: 'flex', textAlign: 'right'}}/>
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+        </Drawer>
+
         <div 
           style={{
             position: 'absolute',
             marginTop: 70,
-            marginLeft: open ? 200 : 20,
+            marginLeft: leftDrawerOpen ? 200 : 20,
             transition: 'margin-left 0.175s ease', // Transition for the button
           }}
         >
           <Button
             color="error"
-            loadingPosition="start"
             variant="outlined"
             onClick={handleClearAll}
             style={{height: 30 }}
@@ -199,7 +337,7 @@ function App() {
             position: 'absolute',
             bottom: 40,
             marginTop: 70,
-            marginLeft: open ? 240 : 60,
+            marginLeft: leftDrawerOpen ? 240 : 60,
             transition: 'margin-left 0.175s ease', // Transition for the button
             //backgroundColor: 'transparent'
           }}
@@ -207,6 +345,69 @@ function App() {
           <img src={wasd} style={{width: 120, height: 120}}/>
         </div>
       </div>
+
+      <Modal 
+        open={newProjectModalOpen} 
+        onClose={() => setNewProjectModalOpen(false)}
+        onMouseEnter={(event) => event.stopPropagation()}
+
+        onMouseDown={(event) => {
+          event.stopPropagation();
+        }}
+        onMouseMove={(event) => {
+          event.stopPropagation();
+        }}
+        onWheel={(event) => {
+          event.stopPropagation();
+        }}
+        onContextMenu={(event) => {
+          event.stopPropagation();
+        }}
+      >
+        <Paper
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            padding: 3,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            boxShadow: 24,
+            borderRadius: 2,
+            bgcolor: "background.paper",
+          }}
+        >
+          <IconButton
+            onClick={() => setNewProjectModalOpen(false)}
+            sx={{ position: "absolute", top: 8, right: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <h2 style={{ margin: 0 }}>New Project</h2>
+          <div style={{display: 'flex', alignItems: 'center', marginTop: 10}}>
+          <TextField
+            variant="outlined"
+            placeholder="Enter project name"
+            fullWidth
+            size="small"
+            //sx={{ marginTop: 1 }}
+          />
+          <Button 
+            size="small" 
+            variant="contained" 
+            color="success"
+            style={{height: 40, padding: 0, fontWeight: 600}}
+            onClick={() => null}
+          >
+            Go
+          </Button>
+          </div>
+
+        </Paper>
+      </Modal>
 
 
 

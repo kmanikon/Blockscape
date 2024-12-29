@@ -215,7 +215,14 @@ export function createScene(mode) {
         terrain[x][y][z] = undefined;
       }
 
+      if (!activeToolData.id) {
+        return;
+      }
+
       const newBlock = createAssetInstance(activeToolData.id, x, y, z, { color: activeToolData.color });
+      if (!newBlock) {
+        return;
+      }
       scene.add(newBlock);
       terrain[x][y][z] = newBlock;
 
