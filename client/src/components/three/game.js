@@ -26,22 +26,24 @@ export function createGame(mode, initialTerrain, setSelectedTerrain) {
   document.addEventListener('wheel', scene.onMouseWheel.bind(scene), false);
   document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
 
-  const handleMouseDown = (event) => scene.onMouseDown(event);
-  const handleMouseMove = (event) => scene.onMouseMove(event);
-  const handleMouseWheel = (event) => scene.onMouseWheel(event);
+  
 
   
-  /*
+  const handleMouseDown = (event) => scene.onMouseDown(event);
+  const handleMouseMove = (event) => scene.onMouseMove(event);
+  //const handleMouseWheel = (event) => scene.onMouseWheel(event);
+  
   // Hook up touch event handlers for mobile
   document.addEventListener('touchstart', (event) => {
     event.preventDefault(); // Prevent touch event from triggering mouse events
     handleMouseDown(event);
   }, { passive: false });
-  */
+  
   document.addEventListener('touchmove', (event) => {
     event.preventDefault(); // Prevent default scroll behavior
     handleMouseMove(event);
   }, { passive: false });
+  
   /*
   document.addEventListener('touchend', (event) => {
     // You can implement touch-end behavior here, similar to mouseup if necessary
