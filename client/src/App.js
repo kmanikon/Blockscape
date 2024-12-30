@@ -137,11 +137,11 @@ function App() {
               if (currentDistance < initialDistance) {
                   // User moved fingers closer together
                   //alert('Pinch detected: scale < 1.0');
-                  scene.onMouseWheel.bind(scene)
+                  scene.onMouseWheel(e)
               } else if (currentDistance > initialDistance) {
                   // User moved fingers further apart
                   //alert('Pinch detected: scale > 1.0');
-                  scene.onMouseWheel.bind(scene)
+                  scene.onMouseWheel(e)
               }
           }
       }, false);
