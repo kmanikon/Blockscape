@@ -66,3 +66,15 @@
   pointer-events: none !important;
 }
   
+.drawer .MuiDrawer-paper {
+  width: 225px !important;
+  max-width: none !important;
+}
+
+.editProjectIcon {
+
+}
+
+.editProjectIcon:hover {
+  color: white !important;
+}

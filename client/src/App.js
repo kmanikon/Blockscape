@@ -19,7 +19,8 @@ import {
   ListItemText,
   Modal,
   Paper,
-  TextField
+  TextField,
+  ButtonGroup
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -30,13 +31,13 @@ import AddIcon from '@mui/icons-material/Add';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { getProjects } from './api/supabase.js';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { getProjects, getProjectById, createProject, editProject, deleteProject } from './api/supabase.js';
 
 import wasd from './assets/wasd.png';
 
 import './App.css';
-
-const drawerWidth = 240;
 
 const colorPalette = [
   "#FF6F61", "#6B5B95", "#88B04B", "#92A8D1", "#DD4124", "#EFC050",
@@ -63,17 +64,22 @@ function App() {
   const [selectedColor, setSelectedColor] = useState();
 
   const [projects, setProjects] = useState([]);
+
+  const [projectName, setProjectName] = useState('');
   const [selectedProject, setSelectedProject] = useState(1);
 
   const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
 
+  const [projectModalMode, setProjectModalMode] = useState('create');
+  const drawerWidth = 240;
+
   useEffect(() => {
     const fetchProjects = async () => {
       const projectData = await getProjects();
-      console.log(projectData)
       setProjects(projectData);
     }
     fetchProjects();
+    
   }, []);
 
   useEffect(() => {
@@ -97,6 +103,49 @@ function App() {
   //const handleDrawerClose = () => setOpen(false);
 
   const handleNewProjctModalClose = () => setNewProjectModalOpen(!newProjectModalOpen);
+
+  const handleCreateProjectOpen = () => {
+    setProjectName('');
+    setNewProjectModalOpen(true);
+    setProjectModalMode('create');
+  }
+
+  const handleEditProjectOpen = (project) => {
+    setProjectName(project.name);
+    setNewProjectModalOpen(true);
+    setProjectModalMode('edit');
+    setSelectedProject(project.id)
+  }
+
+  const handleDeleteProjectOpen = (project) => {
+    setNewProjectModalOpen(true);
+    setProjectModalMode('delete');
+    setSelectedProject(project.id)
+  }
+
+  const handleCreateSubmit = async (project) => {
+    const data = await createProject(project);
+    if (data?.length > 0){
+      setProjects([...projects, {id: data[0].id, name: data[0].name}])
+    }
+    setNewProjectModalOpen(false);
+  }
+
+  const handleEditSubmit = async (oldProject, newProject) => {
+    const data = await editProject(oldProject, newProject);
+    if (data){
+       setProjects(projects.map((p) => p.id === selectedProject ? {id: p.id, name: newProject.name} : p))
+    }
+    setNewProjectModalOpen(false);
+  }
+
+  const handleDeleteSubmit = async (project) => {
+    const data = await deleteProject(project);
+    if (data){
+       setProjects(projects.filter((p) => p.id !== selectedProject));
+    }
+    setNewProjectModalOpen(false);
+  }
 
   return (
     <>
@@ -158,13 +207,15 @@ function App() {
               aria-label="open drawer"
               onClick={handleRightDrawerToggle}
               edge="start"
-              sx={{ marginRight: 6 }}
+              sx={{ marginRight: 1 }}
               style={{textTransform: 'none', backgroundColor: 'transparent'}}
             >
-              <MenuIcon/>
+              <FormatListBulletedIcon/>
+              {/*}
               <Typography variant="h6" noWrap style={{ fontWeight: 560, marginLeft: 15, fontSize: 17 }}>
                 Projects
               </Typography>
+              */}
               
             </Button>
            
@@ -247,10 +298,11 @@ function App() {
         {/* right drawer */}
         <Drawer
           anchor="right"
+          className="drawer"
           sx={{
             flexShrink: 0,
             '& .MuiDrawer-paper': {
-              width: drawerWidth,
+              //width: drawerWidth,
               height: 'calc(100vh - 40px)',
               marginTop: '55px',
               color: darkmode.offWhiteText,
@@ -291,7 +343,7 @@ function App() {
             style={{width: '100%', padding: 0, margin: 5, borderTop: `1px solid ${darkmode.drawerSelect}`, paddingTop: 5 }}
           >
             <ListItem disablePadding className="drawer-button">
-              <ListItemButton style={{ backgroundColor: 'transparent' }} onClick={() => setNewProjectModalOpen(true)}>
+              <ListItemButton style={{ backgroundColor: 'transparent' }} onClick={() => handleCreateProjectOpen()}>
                 <AddIcon style={{color: darkmode.buttonAccent, marginRight: 16}}/>
                 <div style={{fontSize: 14, fontWeight: 600}}>New Project</div>
 
@@ -300,10 +352,38 @@ function App() {
             
             {projects.map((project, index) => (
               <ListItem key={index} disablePadding className="drawer-button" style={{marginTop: 5}}>
-                <ListItemButton style={{ backgroundColor: selectedProject === project.id ? darkmode.drawerSelect : 'transparent' }}>
+                <ListItemButton 
+                  onClick={() => setSelectedProject(project.id)}
+                  style={{ backgroundColor: selectedProject === project.id ? darkmode.drawerSelect : 'transparent', justifyContent: 'space-between' }}
+                >
+                  <div style={{display: 'flex', alignItems: 'center'}}>
                   <ArticleOutlinedIcon style={{color: darkmode.buttonAccent, marginRight: 16}}/>
                   <div style={{fontSize: 14, fontWeight: 600, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{project.name}</div>
-                  <EditOutlinedIcon style={{ paddingLeft: 12, color: darkmode.buttonAccent, fontSize: 18, display: 'flex', textAlign: 'right'}}/>
+                  </div>
+                  <div style={{display: 'flex', alignItems: 'center'}}>
+                  <DeleteOutlineOutlinedIcon
+                    onClick={handleDeleteProjectOpen}
+                    className="editProjectIcon" 
+                    style={{ 
+                      paddingLeft: 12, 
+                      color: darkmode.buttonAccent, 
+                      fontSize: 18, 
+                      display: 'flex', 
+                      textAlign: 'right'
+                    }}
+                  />
+                  <EditOutlinedIcon 
+                    onClick={() => handleEditProjectOpen(project)}
+                    className="editProjectIcon" 
+                    style={{ 
+                      paddingLeft: 12, 
+                      color: darkmode.buttonAccent, 
+                      fontSize: 18, 
+                      display: 'flex', 
+                      textAlign: 'right'
+                    }}
+                  />
+                  </div>
                 </ListItemButton>
               </ListItem>
             ))}
@@ -316,7 +396,7 @@ function App() {
             position: 'absolute',
             marginTop: 70,
             marginLeft: leftDrawerOpen ? 200 : 20,
-            transition: 'margin-left 0.175s ease', // Transition for the button
+            //transition: 'margin-left 0.025s ease', // Transition for the button
           }}
         >
           <Button
@@ -337,8 +417,8 @@ function App() {
             position: 'absolute',
             bottom: 40,
             marginTop: 70,
-            marginLeft: leftDrawerOpen ? 240 : 60,
-            transition: 'margin-left 0.175s ease', // Transition for the button
+            marginLeft: leftDrawerOpen ? 200 : 20,
+            //transition: 'margin-left 0.175s ease', // Transition for the button
             //backgroundColor: 'transparent'
           }}
         >
@@ -380,19 +460,23 @@ function App() {
             bgcolor: "background.paper",
           }}
         >
+          {projectModalMode !== 'delete' ?
+          <>
           <IconButton
             onClick={() => setNewProjectModalOpen(false)}
             sx={{ position: "absolute", top: 8, right: 8 }}
           >
             <CloseIcon />
           </IconButton>
-          <h2 style={{ margin: 0 }}>New Project</h2>
+          <h2 style={{ margin: 0 }}>{projectModalMode === 'create' ? 'New Project' : 'Edit Project'}</h2>
           <div style={{display: 'flex', alignItems: 'center', marginTop: 10}}>
           <TextField
             variant="outlined"
             placeholder="Enter project name"
             fullWidth
             size="small"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
             //sx={{ marginTop: 1 }}
           />
           <Button 
@@ -400,11 +484,45 @@ function App() {
             variant="contained" 
             color="success"
             style={{height: 40, padding: 0, fontWeight: 600}}
-            onClick={() => null}
+            onClick={
+              projectModalMode === 'create' ?
+                () => handleCreateSubmit({ name: projectName })
+              :
+                () => handleEditSubmit(projects.find((p) => p.id === selectedProject), { name: projectName })
+            }
           >
             Go
           </Button>
           </div>
+          </>
+          :
+            <>
+             <IconButton
+              onClick={() => setNewProjectModalOpen(false)}
+              sx={{ position: "absolute", top: 8, right: 8 }}
+            >
+              <CloseIcon />
+            </IconButton>
+            <h2 style={{ margin: 0 }}>Delete Project?</h2>
+            <ButtonGroup fullWidth>
+              <Button 
+                color="warning" 
+                onClick={() => handleDeleteSubmit(projects.find((p) => p.id === selectedProject))}
+                style={{fontWeight: 560}}
+              >
+                yes
+              </Button>
+              <Button 
+                variant="contained" 
+                color="warning" 
+                onClick={() => setNewProjectModalOpen(false)}
+                style={{fontWeight: 560}}
+              >
+                no
+              </Button>
+            </ButtonGroup>
+            </>
+          }
 
         </Paper>
       </Modal>
