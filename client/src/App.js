@@ -115,38 +115,40 @@ function App() {
 
       let initialDistance = null;
 
-document.addEventListener('touchstart', function(e) {
-    if (e.touches.length === 2) {
-        // Calculate the initial distance between two touch points
-        initialDistance = Math.hypot(
-            e.touches[0].pageX - e.touches[1].pageX,
-            e.touches[0].pageY - e.touches[1].pageY
-        );
-    }
-}, false);
+      document.addEventListener('touchstart', function(e) {
+          if (e.touches.length === 2) {
+              // Calculate the initial distance between two touch points
+              initialDistance = Math.hypot(
+                  e.touches[0].pageX - e.touches[1].pageX,
+                  e.touches[0].pageY - e.touches[1].pageY
+              );
+          }
+      }, false);
 
-document.addEventListener('touchmove', function(e) {
-    if (e.touches.length === 2 && initialDistance !== null) {
-        // Calculate the new distance between two touch points
-        let currentDistance = Math.hypot(
-            e.touches[0].pageX - e.touches[1].pageX,
-            e.touches[0].pageY - e.touches[1].pageY
-        );
+      document.addEventListener('touchmove', function(e) {
+          if (e.touches.length === 2 && initialDistance !== null) {
+              // Calculate the new distance between two touch points
+              let currentDistance = Math.hypot(
+                  e.touches[0].pageX - e.touches[1].pageX,
+                  e.touches[0].pageY - e.touches[1].pageY
+              );
 
-        // Compare the initial and current distances to determine pinch direction
-        if (currentDistance < initialDistance) {
-            // User moved fingers closer together
-            alert('Pinch detected: scale < 1.0');
-        } else if (currentDistance > initialDistance) {
-            // User moved fingers further apart
-            alert('Pinch detected: scale > 1.0');
-        }
-    }
-}, false);
+              // Compare the initial and current distances to determine pinch direction
+              if (currentDistance < initialDistance) {
+                  // User moved fingers closer together
+                  //alert('Pinch detected: scale < 1.0');
+                  scene.onMouseWheel.bind(scene)
+              } else if (currentDistance > initialDistance) {
+                  // User moved fingers further apart
+                  //alert('Pinch detected: scale > 1.0');
+                  scene.onMouseWheel.bind(scene)
+              }
+          }
+      }, false);
 
-document.addEventListener('touchend', function(e) {
-    initialDistance = null; // Reset the initial distance on touch end
-}, false);
+      document.addEventListener('touchend', function(e) {
+          initialDistance = null; // Reset the initial distance on touch end
+      }, false);
 
     }
     
