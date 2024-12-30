@@ -92,78 +92,97 @@ function App() {
 
   useEffect(() => {
     let s;
+    
     const fetchTerrain = async () => {
       const data = await getProjectById(selectedProject);
-      //sessionStorage.setItem('terrain', data);
       setSelectedTerrain(data);
+      
       if (refContainer.current) {
         while (refContainer.current.firstChild) {
           refContainer.current.removeChild(refContainer.current.firstChild);
         }
       }
+      
       let { game, scene } = createGame('dark', data, setSelectedTerrain);
       window.game = game;
       s = scene;
-
-      // Hook up mouse event handlers to the scene
-      document.addEventListener('mousedown', scene.onMouseDown.bind(scene), false);
-      document.addEventListener('mousemove', scene.onMouseMove.bind(scene), false);
-      document.addEventListener('wheel', scene.onMouseWheel.bind(scene), {passive: false});
-      document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
-
-      
-
-      let initialDistance = null;
-
-      document.addEventListener('touchstart', function(e) {
-          if (e.touches.length === 2) {
-              // Calculate the initial distance between two touch points
-              initialDistance = Math.hypot(
-                  e.touches[0].pageX - e.touches[1].pageX,
-                  e.touches[0].pageY - e.touches[1].pageY
-              );
+  
+      // Prevent default touch behaviors
+      const preventDefault = (e) => e.preventDefault();
+      document.addEventListener('touchmove', preventDefault, { passive: false });
+      document.addEventListener('contextmenu', preventDefault);
+  
+      // Mouse events
+      document.addEventListener('mousedown', scene.onMouseDown);
+      document.addEventListener('mousemove', scene.onMouseMove);
+      document.addEventListener('wheel', scene.onMouseWheel, { passive: false });
+  
+      // Touch events
+      document.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousedown', {
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        });
+        scene.onMouseDown(mouseEvent);
+      });
+  
+      document.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousemove', {
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        });
+        scene.onMouseMove(mouseEvent);
+      });
+  
+      // Pinch zoom
+      let lastDistance = 0;
+      document.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+          const touch1 = e.touches[0];
+          const touch2 = e.touches[1];
+          const distance = Math.hypot(
+            touch2.clientX - touch1.clientX,
+            touch2.clientY - touch1.clientY
+          );
+  
+          if (lastDistance) {
+            const delta = lastDistance - distance;
+            const wheelEvent = new WheelEvent('wheel', {
+              deltaY: delta
+            });
+            scene.onMouseWheel(wheelEvent);
           }
-      }, false);
-
-      document.addEventListener('touchmove', function(e) {
-          if (e.touches.length === 2 && initialDistance !== null) {
-              // Calculate the new distance between two touch points
-              let currentDistance = Math.hypot(
-                  e.touches[0].pageX - e.touches[1].pageX,
-                  e.touches[0].pageY - e.touches[1].pageY
-              );
-
-              // Compare the initial and current distances to determine pinch direction
-              if (currentDistance < initialDistance) {
-                  // User moved fingers closer together
-                  alert(`Pinch detected: scale = ${currentDistance}}`);
-                  //scene.onMouseWheel(e)
-              } else if (currentDistance > initialDistance) {
-                  // User moved fingers further apart
-                  alert(`Pinch detected: scale = ${currentDistance}}`);
-                  //scene.onMouseWheel(e)
-              }
-          }
-      }, false);
-
-      document.addEventListener('touchend', function(e) {
-          initialDistance = null; // Reset the initial distance on touch end
-      }, false);
-
-    }
-    
+          lastDistance = distance;
+        }
+      });
+  
+      document.addEventListener('touchend', () => {
+        lastDistance = 0;
+      });
+    };
+  
     if (selectedProject !== -1) {
       fetchTerrain();
-
+  
       return () => {
-        document.removeEventListener('mousedown', s.onMouseDown.bind(s), false);
-        document.removeEventListener('mousemove', s.onMouseMove.bind(s), false);
-        document.removeEventListener('wheel', s.onMouseWheel.bind(s), false);
-        document.removeEventListener('contextmenu', (event) => event.preventDefault(), false);
-      }
+        const preventDefault = (e) => e.preventDefault();
+        
+        document.removeEventListener('touchmove', preventDefault);
+        document.removeEventListener('contextmenu', preventDefault);
+        document.removeEventListener('mousedown', s.onMouseDown);
+        document.removeEventListener('mousemove', s.onMouseMove);
+        document.removeEventListener('wheel', s.onMouseWheel);
+        
+        document.removeEventListener('touchstart', preventDefault);
+        document.removeEventListener('touchmove', preventDefault);
+        document.removeEventListener('touchend', preventDefault);
+      };
     }
-
-  }, [selectedProject])
+  }, [selectedProject]);
 
   const swapTool = (toolId, toolColor) => {
     const newTool = { id: toolId, color: toolColor || 0x000000 };
