@@ -58,7 +58,7 @@ export function handleClearAll() {
     }
   }
 
-  sessionStorage.removeItem('terrain');
+  //sessionStorage.removeItem('terrain');
 
 
   // setup lights
@@ -76,7 +76,7 @@ export function handleClearAll() {
   scene.add(...lights);
 }
 
-export function createScene(mode) {
+export function createScene(mode, setSelectedTerrain) {
   gameWindow = document.getElementById('render-target');
   scene = new THREE.Scene();
   //scene.background = new THREE.Color(mode === 'light' ? 0xFAFAFA : 0xACACAC);
@@ -93,7 +93,7 @@ export function createScene(mode) {
 
   let onObjectSelected = undefined;
 
-  function initialize(city) {
+  function initialize(city, initialTerrain) {
     scene.clear();
     terrain = [];
     highlightedBlocks = [];
@@ -101,7 +101,7 @@ export function createScene(mode) {
     citySize = city.size;
 
     
-    const cachedTerrain = sessionStorage.getItem('terrain');
+    const cachedTerrain = initialTerrain;//sessionStorage.getItem('terrain');
 
     if (cachedTerrain) {
       const parsedTerrain = JSON.parse(cachedTerrain);
@@ -227,7 +227,8 @@ export function createScene(mode) {
       terrain[x][y][z] = newBlock;
 
       const terrainString = JSON.stringify(terrain);
-      sessionStorage.setItem('terrain', terrainString);
+      //sessionStorage.setItem('terrain', terrainString);
+      setSelectedTerrain(terrainString)
     }
   }
 
@@ -249,7 +250,8 @@ export function createScene(mode) {
         terrain[selectedObject.userData.x][selectedObject.userData.y][selectedObject.userData.z] = undefined;
 
         const terrainString = JSON.stringify(terrain);
-        sessionStorage.setItem('terrain', terrainString); 
+        //sessionStorage.setItem('terrain', terrainString); 
+        setSelectedTerrain(terrainString)
       }
   }
 

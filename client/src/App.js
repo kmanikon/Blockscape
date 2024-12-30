@@ -68,7 +68,7 @@ function App() {
 
   const [projectName, setProjectName] = useState('');
   const [selectedProject, setSelectedProject] = useState(-1);
-  //const [selectedTerrain, setSelectedTerrain] = useState();
+  const [selectedTerrain, setSelectedTerrain] = useState();
 
   const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
 
@@ -90,13 +90,14 @@ function App() {
   useEffect(() => {
     const fetchTerrain = async () => {
       const data = await getProjectById(selectedProject);
-      sessionStorage.setItem('terrain', data);
+      //sessionStorage.setItem('terrain', data);
+      setSelectedTerrain(data);
       if (refContainer.current) {
         while (refContainer.current.firstChild) {
           refContainer.current.removeChild(refContainer.current.firstChild);
         }
       }
-      window.game = createGame('dark');
+      window.game = createGame('dark', data, setSelectedTerrain);
     }
     if (selectedProject !== -1) {
       fetchTerrain();
@@ -175,8 +176,15 @@ function App() {
   }
 
   const handleSave = async () => {
-    const terrainString = sessionStorage.getItem('terrain');
+    const terrainString = selectedTerrain;//sessionStorage.getItem('terrain');
+    console.log(selectedTerrain)
     const data = await saveProjectTerrain({ id: selectedProject, terrain_string: terrainString})
+  }
+
+  const clearAll = () => {
+    setSelectedTerrain('');
+    // clear scene
+    handleClearAll();
   }
 
   return (
@@ -447,7 +455,7 @@ function App() {
           <Button
             color="error"
             variant="outlined"
-            onClick={handleClearAll}
+            onClick={clearAll}
             style={{height: 30 }}
           >
             <HighlightOffIcon style={{marginRight: 10}}/>

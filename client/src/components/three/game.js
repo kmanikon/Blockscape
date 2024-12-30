@@ -12,12 +12,12 @@ const setActiveToolData = (toolData) => {
     activeToolData = { id: toolData.id, color: toolData.color };
 }
 
-export function createGame(mode) {
+export function createGame(mode, initialTerrain, setSelectedTerrain) {
 
-  const scene = createScene(mode);
+  const scene = createScene(mode, setSelectedTerrain);
   const city = createCity(16);
 
-  scene.initialize(city);
+  scene.initialize(city, initialTerrain,);
 
 
   // Hook up mouse event handlers to the scene
