@@ -111,7 +111,7 @@ function App() {
       document.addEventListener('wheel', scene.onMouseWheel.bind(scene), {passive: false});
       document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
 
-      document.addEventListener('onTouchMove', scene.onMouseMove.bind(scene), false);
+      document.addEventListener('touchmove', scene.onMouseMove.bind(scene), false);
     }
     
     if (selectedProject !== -1) {
