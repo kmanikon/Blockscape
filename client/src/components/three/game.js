@@ -27,11 +27,22 @@ export function createGame(mode, initialTerrain, setSelectedTerrain) {
   document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
   */
 
-  let lastTouchDistance = 0;
+  const isMobileDevice = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return (
+      /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent) ||
+      // Also check for touch capability as a fallback
+      ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+    );
+  };
+
+  const isMobile = isMobileDevice();
+    let lastTouchDistance = 0;
     let isDragging = false;
     let lastX = 0;
     let lastY = 0;
 
+    // Touch control handlers
     const getTouchDistance = (touches) => {
       const dx = touches[0].clientX - touches[1].clientX;
       const dy = touches[0].clientY - touches[1].clientY;
@@ -50,16 +61,14 @@ export function createGame(mode, initialTerrain, setSelectedTerrain) {
       isDragging = true;
 
       if (event.touches.length === 1) {
-        // Single touch - equivalent to left mouse button
         lastX = event.touches[0].clientX;
         lastY = event.touches[0].clientY;
         scene.onMouseDown({
           clientX: lastX,
           clientY: lastY,
-          button: 0 // Left click
+          button: 0
         });
       } else if (event.touches.length === 2) {
-        // Two finger touch - prepare for pinch/zoom or right-click equivalent
         lastTouchDistance = getTouchDistance(event.touches);
         const center = getTouchCenter(event.touches);
         lastX = center.x;
@@ -67,7 +76,7 @@ export function createGame(mode, initialTerrain, setSelectedTerrain) {
         scene.onMouseDown({
           clientX: center.x,
           clientY: center.y,
-          button: 2 // Right click
+          button: 2
         });
       }
     };
@@ -77,7 +86,6 @@ export function createGame(mode, initialTerrain, setSelectedTerrain) {
       if (!isDragging) return;
 
       if (event.touches.length === 1) {
-        // Single finger drag
         const touchX = event.touches[0].clientX;
         const touchY = event.touches[0].clientY;
         
@@ -91,19 +99,16 @@ export function createGame(mode, initialTerrain, setSelectedTerrain) {
         lastX = touchX;
         lastY = touchY;
       } else if (event.touches.length === 2) {
-        // Handle pinch zoom
         const currentDistance = getTouchDistance(event.touches);
         const delta = currentDistance - lastTouchDistance;
         
-        // Simulate mouse wheel with pinch gesture
         scene.onMouseWheel({
-          deltaY: -delta, // Negative delta zooms in, positive zooms out
+          deltaY: -delta,
           preventDefault: () => {}
         });
 
         lastTouchDistance = currentDistance;
 
-        // Update center position for two-finger drag
         const center = getTouchCenter(event.touches);
         scene.onMouseMove({
           clientX: center.x,
@@ -123,12 +128,37 @@ export function createGame(mode, initialTerrain, setSelectedTerrain) {
       lastTouchDistance = 0;
     };
 
-    // Add touch event listeners
-    document.addEventListener('touchstart', handleTouchStart, { passive: false });
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd, { passive: false });
-    document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
+    // Mouse control handlers
+    const handleMouseDown = (event) => {
+      scene.onMouseDown(event);
+    };
 
+    const handleMouseMove = (event) => {
+      scene.onMouseMove(event);
+    };
+
+    const handleMouseWheel = (event) => {
+      scene.onMouseWheel(event);
+    };
+
+    const preventContextMenu = (event) => event.preventDefault();
+
+    // Add event listeners based on device type
+    if (isMobile) {
+      document.addEventListener('touchstart', handleTouchStart, { passive: false });
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd, { passive: false });
+    } else {
+      document.addEventListener('mousedown', handleMouseDown, false);
+      document.addEventListener('mousemove', handleMouseMove, false);
+      document.addEventListener('wheel', handleMouseWheel, false);
+    }
+    
+    // Context menu should be prevented on both
+    document.addEventListener('contextmenu', preventContextMenu, false);
+
+
+    
   const game = {
     clearHighlights() {
       scene.clearHighlights();
