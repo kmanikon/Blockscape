@@ -91,6 +91,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    let s;
     const fetchTerrain = async () => {
       const data = await getProjectById(selectedProject);
       //sessionStorage.setItem('terrain', data);
@@ -100,27 +101,29 @@ function App() {
           refContainer.current.removeChild(refContainer.current.firstChild);
         }
       }
-      window.game = createGame('dark', data, setSelectedTerrain);
+      let { game, scene } = createGame('dark', data, setSelectedTerrain);
+      window.game = game;
+      s = scene;
+
+      // Hook up mouse event handlers to the scene
+      document.addEventListener('mousedown', scene.onMouseDown.bind(scene), false);
+      document.addEventListener('mousemove', scene.onMouseMove.bind(scene), false);
+      document.addEventListener('wheel', scene.onMouseWheel.bind(scene), false);
+      document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
     }
+    
     if (selectedProject !== -1) {
       fetchTerrain();
+
+      return () => {
+        document.removeEventListener('mousedown', s.onMouseDown.bind(s), false);
+        document.removeEventListener('mousemove', s.onMouseMove.bind(s), false);
+        document.removeEventListener('wheel', s.onMouseWheel.bind(s), false);
+        document.removeEventListener('contextmenu', (event) => event.preventDefault(), false);
+      }
     }
 
   }, [selectedProject])
-
-  /*
-  useEffect(() => {
-    if (refContainer.current) {
-      while (refContainer.current.firstChild) {
-        refContainer.current.removeChild(refContainer.current.firstChild);
-      }
-    }
-    window.game = createGame('dark');
-    //if (projects.length > 0){
-    
-    //};
-  }, []);
-  */
 
   const swapTool = (toolId, toolColor) => {
     const newTool = { id: toolId, color: toolColor || 0x000000 };

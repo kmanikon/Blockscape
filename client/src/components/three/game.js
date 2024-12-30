@@ -19,13 +19,6 @@ export function createGame(mode, initialTerrain, setSelectedTerrain) {
 
   scene.initialize(city, initialTerrain,);
 
-
-  // Hook up mouse event handlers to the scene
-  document.addEventListener('mousedown', scene.onMouseDown.bind(scene), false);
-  document.addEventListener('mousemove', scene.onMouseMove.bind(scene), false);
-  document.addEventListener('wheel', scene.onMouseWheel.bind(scene), false);
-  document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
-  
   const game = {
     clearHighlights() {
       scene.clearHighlights();
@@ -34,7 +27,7 @@ export function createGame(mode, initialTerrain, setSelectedTerrain) {
 
   scene.start();
 
-  return game;
+  return { game, scene };
 }
 
 export { activeToolData, setActiveToolData };
