@@ -67,7 +67,7 @@ function App() {
   const [projects, setProjects] = useState([]);
 
   const [projectName, setProjectName] = useState('');
-  const [selectedProject, setSelectedProject] = useState(0);
+  const [selectedProject, setSelectedProject] = useState(-1);
   //const [selectedTerrain, setSelectedTerrain] = useState();
 
   const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
@@ -82,14 +82,6 @@ function App() {
       if (projectData.length > 0) {
         setSelectedProject(projectData[0].id)
       }
-      const selectedTerrain = await getProjectById(selectedProject);
-      localStorage.setItem('terrain', selectedTerrain)
-      if (refContainer.current) {
-        while (refContainer.current.firstChild) {
-          refContainer.current.removeChild(refContainer.current.firstChild);
-        }
-      }
-      window.game = createGame('dark');
     }
     fetchProjects();
     
@@ -98,7 +90,7 @@ function App() {
   useEffect(() => {
     const fetchTerrain = async () => {
       const data = await getProjectById(selectedProject);
-      localStorage.setItem('terrain', data);
+      sessionStorage.setItem('terrain', data);
       if (refContainer.current) {
         while (refContainer.current.firstChild) {
           refContainer.current.removeChild(refContainer.current.firstChild);
@@ -106,9 +98,10 @@ function App() {
       }
       window.game = createGame('dark');
     }
-    if (projects.length > 0) {
+    if (selectedProject !== -1) {
       fetchTerrain();
     }
+    
   }, [selectedProject])
 
   /*
@@ -182,8 +175,7 @@ function App() {
   }
 
   const handleSave = async () => {
-    const terrainString = localStorage.getItem('terrain');
-    console.log({ id: selectedProject, terrainString});
+    const terrainString = sessionStorage.getItem('terrain');
     const data = await saveProjectTerrain({ id: selectedProject, terrain_string: terrainString})
   }
 

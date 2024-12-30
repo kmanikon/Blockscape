@@ -58,7 +58,7 @@ export function handleClearAll() {
     }
   }
 
-  localStorage.removeItem('terrain');
+  sessionStorage.removeItem('terrain');
 
 
   // setup lights
@@ -101,7 +101,7 @@ export function createScene(mode) {
     citySize = city.size;
 
     
-    const cachedTerrain = localStorage.getItem('terrain');
+    const cachedTerrain = sessionStorage.getItem('terrain');
 
     if (cachedTerrain) {
       const parsedTerrain = JSON.parse(cachedTerrain);
@@ -227,7 +227,7 @@ export function createScene(mode) {
       terrain[x][y][z] = newBlock;
 
       const terrainString = JSON.stringify(terrain);
-      localStorage.setItem('terrain', terrainString);
+      sessionStorage.setItem('terrain', terrainString);
     }
   }
 
@@ -249,7 +249,7 @@ export function createScene(mode) {
         terrain[selectedObject.userData.x][selectedObject.userData.y][selectedObject.userData.z] = undefined;
 
         const terrainString = JSON.stringify(terrain);
-        localStorage.setItem('terrain', terrainString); 
+        sessionStorage.setItem('terrain', terrainString); 
       }
   }
 

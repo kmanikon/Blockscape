@@ -8,7 +8,6 @@ const supabaseClient = createClient(
 const getProjects = async () => {
     const { data } = await supabaseClient.from("terrain_entries").select(`id, name`);
     //const data = [];
-    //console.log(data);
     return data;
 };
 
@@ -35,7 +34,6 @@ const createProject = async (project) => {
             .from("terrain_entries")
             .upsert({ name: project.name,  terrain_string: ''})
             .select()
-        //console.log(data);
         return data;
     } catch (e) {
         console.log(e);
