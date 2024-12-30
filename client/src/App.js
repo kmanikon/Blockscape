@@ -33,7 +33,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { getProjects, getProjectById, createProject, editProject, deleteProject } from './api/supabase.js';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import { getProjects, getProjectById, createProject, editProject, deleteProject, saveProjectTerrain } from './api/supabase.js';
 
 import wasd from './assets/wasd.png';
 
@@ -66,7 +67,8 @@ function App() {
   const [projects, setProjects] = useState([]);
 
   const [projectName, setProjectName] = useState('');
-  const [selectedProject, setSelectedProject] = useState(1);
+  const [selectedProject, setSelectedProject] = useState(0);
+  //const [selectedTerrain, setSelectedTerrain] = useState();
 
   const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
 
@@ -77,11 +79,39 @@ function App() {
     const fetchProjects = async () => {
       const projectData = await getProjects();
       setProjects(projectData);
+      if (projectData.length > 0) {
+        setSelectedProject(projectData[0].id)
+      }
+      const selectedTerrain = await getProjectById(selectedProject);
+      localStorage.setItem('terrain', selectedTerrain)
+      if (refContainer.current) {
+        while (refContainer.current.firstChild) {
+          refContainer.current.removeChild(refContainer.current.firstChild);
+        }
+      }
+      window.game = createGame('dark');
     }
     fetchProjects();
     
   }, []);
 
+  useEffect(() => {
+    const fetchTerrain = async () => {
+      const data = await getProjectById(selectedProject);
+      localStorage.setItem('terrain', data);
+      if (refContainer.current) {
+        while (refContainer.current.firstChild) {
+          refContainer.current.removeChild(refContainer.current.firstChild);
+        }
+      }
+      window.game = createGame('dark');
+    }
+    if (projects.length > 0) {
+      fetchTerrain();
+    }
+  }, [selectedProject])
+
+  /*
   useEffect(() => {
     if (refContainer.current) {
       while (refContainer.current.firstChild) {
@@ -89,7 +119,11 @@ function App() {
       }
     }
     window.game = createGame('dark');
+    //if (projects.length > 0){
+    
+    //};
   }, []);
+  */
 
   const swapTool = (toolId, toolColor) => {
     const newTool = { id: toolId, color: toolColor || 0x000000 };
@@ -145,6 +179,12 @@ function App() {
        setProjects(projects.filter((p) => p.id !== selectedProject));
     }
     setNewProjectModalOpen(false);
+  }
+
+  const handleSave = async () => {
+    const terrainString = localStorage.getItem('terrain');
+    console.log({ id: selectedProject, terrainString});
+    const data = await saveProjectTerrain({ id: selectedProject, terrain_string: terrainString})
   }
 
   return (
@@ -399,6 +439,19 @@ function App() {
             //transition: 'margin-left 0.025s ease', // Transition for the button
           }}
         >
+           <Button
+            color="success"
+            variant="outlined"
+            onClick={handleSave}
+            style={{height: 30, marginRight: 10 }}
+          >
+            <SaveOutlinedIcon style={{marginRight: 10}}/>
+            <div>
+              Save Project
+            </div>
+            
+          </Button>
+
           <Button
             color="error"
             variant="outlined"

@@ -13,8 +13,16 @@ const getProjects = async () => {
 };
 
 const getProjectById = async (id) => {
-    const { data } = await supabaseClient.from("terrain_entries").select(`id, name, terrain_string`).eq('id', id);
-    return data;
+    try {
+        const { data } = await supabaseClient.from("terrain_entries").select(`terrain_string`).eq('id', id);
+        if (data.length === 0) {
+            return '';
+        }
+        return data[0].terrain_string;
+    } catch (e) {
+        console.log(e);
+        return '';
+    }
 }
 
 const createProject = async (project) => {
@@ -51,6 +59,22 @@ const editProject = async (oldProject, newProject) => {
     }
 }
 
+const saveProjectTerrain = async (project) => {
+    if (!project) {
+        return;
+    }
+    try {
+        const { data, error } = await supabaseClient
+            .from("terrain_entries")
+            .update({ terrain_string: project.terrain_string})
+            .eq('id', project.id)
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+}
+
 const deleteProject = async (project) => {
     if (!project) {
         return;
@@ -67,4 +91,4 @@ const deleteProject = async (project) => {
     }
 }
 
-export { getProjects, getProjectById, createProject, editProject, deleteProject };
+export { getProjects, getProjectById, createProject, editProject, deleteProject, saveProjectTerrain };
