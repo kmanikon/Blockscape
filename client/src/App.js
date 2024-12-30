@@ -20,9 +20,10 @@ import {
   Modal,
   Paper,
   TextField,
-  ButtonGroup
+  ButtonGroup,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import Grid from '@mui/material/Grid2';
 import MenuIcon from '@mui/icons-material/Menu';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -46,6 +47,8 @@ const colorPalette = [
   "#955251", "#F7CAC9", "#F3D6E4"
 ];
 
+const isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+
 const darkmode = {
   navbar: '#222222',
   offWhiteText: '#F5F5F5',
@@ -60,8 +63,8 @@ const darkmode = {
 function App() {
   const refContainer = useRef(null);
   const theme = useTheme();
-  const [leftDrawerOpen, setLeftDrawerOpen] = useState(true);
-  const [rightDrawerOpen, setRightDrawerOpen] = useState(true);
+  const [leftDrawerOpen, setLeftDrawerOpen] = useState(isMobile ? false : true);
+  const [rightDrawerOpen, setRightDrawerOpen] = useState(isMobile ? false : true);
   const [selectedColor, setSelectedColor] = useState();
 
   const [projects, setProjects] = useState([]);
@@ -84,7 +87,7 @@ function App() {
       }
     }
     fetchProjects();
-    
+
   }, []);
 
   useEffect(() => {
@@ -102,7 +105,7 @@ function App() {
     if (selectedProject !== -1) {
       fetchTerrain();
     }
-    
+
   }, [selectedProject])
 
   /*
@@ -153,32 +156,31 @@ function App() {
 
   const handleCreateSubmit = async (project) => {
     const data = await createProject(project);
-    if (data?.length > 0){
-      setProjects([...projects, {id: data[0].id, name: data[0].name}])
+    if (data?.length > 0) {
+      setProjects([...projects, { id: data[0].id, name: data[0].name }])
     }
     setNewProjectModalOpen(false);
   }
 
   const handleEditSubmit = async (oldProject, newProject) => {
     const data = await editProject(oldProject, newProject);
-    if (data){
-       setProjects(projects.map((p) => p.id === selectedProject ? {id: p.id, name: newProject.name} : p))
+    if (data) {
+      setProjects(projects.map((p) => p.id === selectedProject ? { id: p.id, name: newProject.name } : p))
     }
     setNewProjectModalOpen(false);
   }
 
   const handleDeleteSubmit = async (project) => {
     const data = await deleteProject(project);
-    if (data){
-       setProjects(projects.filter((p) => p.id !== selectedProject));
+    if (data) {
+      setProjects(projects.filter((p) => p.id !== selectedProject));
     }
     setNewProjectModalOpen(false);
   }
 
   const handleSave = async () => {
     const terrainString = selectedTerrain;//sessionStorage.getItem('terrain');
-    console.log(selectedTerrain)
-    const data = await saveProjectTerrain({ id: selectedProject, terrain_string: terrainString})
+    const data = await saveProjectTerrain({ id: selectedProject, terrain_string: terrainString })
   }
 
   const clearAll = () => {
@@ -190,10 +192,10 @@ function App() {
   return (
     <>
 
-      <AppBar 
-        position="fixed" 
-        sx={{ boxShadow: 'none' }} 
-        
+      <AppBar
+        position="fixed"
+        sx={{ boxShadow: 'none' }}
+
         onMouseDown={(event) => {
           event.stopPropagation();
         }}
@@ -206,7 +208,7 @@ function App() {
         onContextMenu={(event) => {
           event.stopPropagation();
         }}
-        
+
       >
         <div
           style={{
@@ -237,7 +239,7 @@ function App() {
             <CubeSvg cubeColor={'#92a8d1'} />
 
             <Typography variant="h6" noWrap style={{ fontWeight: 560, marginLeft: 15 }}>
-              3D Sandbox
+              Blockscape
             </Typography>
           </div>
 
@@ -248,17 +250,17 @@ function App() {
               onClick={handleRightDrawerToggle}
               edge="start"
               sx={{ marginRight: 1 }}
-              style={{textTransform: 'none', backgroundColor: 'transparent'}}
+              style={{ textTransform: 'none', backgroundColor: 'transparent' }}
             >
-              <FormatListBulletedIcon/>
+              <FormatListBulletedIcon />
               {/*}
               <Typography variant="h6" noWrap style={{ fontWeight: 560, marginLeft: 15, fontSize: 17 }}>
                 Projects
               </Typography>
               */}
-              
+
             </Button>
-           
+
           </div>
         </div>
       </AppBar>
@@ -307,7 +309,7 @@ function App() {
           }}
         >
 
-          <List 
+          <List
             onWheel={(event) => {
               event.stopPropagation();
             }}
@@ -318,7 +320,7 @@ function App() {
                 <ListItemIcon>
                   <ClearCubeSvg />
                 </ListItemIcon>
-                <div style={{fontSize: 15, fontWeight: 600}}>Clear</div>
+                <div style={{ fontSize: 15, fontWeight: 600 }}>Clear</div>
               </ListItemButton>
             </ListItem>
             {colorPalette.map((color, index) => (
@@ -327,7 +329,7 @@ function App() {
                   <ListItemIcon>
                     <CubeSvg cubeColor={color} />
                   </ListItemIcon>
-                  <div style={{fontSize: 15, fontWeight: 600}}>{color}</div>
+                  <div style={{ fontSize: 15, fontWeight: 600 }}>{color}</div>
                 </ListItemButton>
               </ListItem>
             ))}
@@ -376,53 +378,53 @@ function App() {
             event.stopPropagation();
           }}
         >
-          <List 
+          <List
             onWheel={(event) => {
               event.stopPropagation();
             }}
-            style={{width: '100%', padding: 0, margin: 5, borderTop: `1px solid ${darkmode.drawerSelect}`, paddingTop: 5 }}
+            style={{ width: '100%', padding: 0, margin: 5, borderTop: `1px solid ${darkmode.drawerSelect}`, paddingTop: 5 }}
           >
             <ListItem disablePadding className="drawer-button">
               <ListItemButton style={{ backgroundColor: 'transparent' }} onClick={() => handleCreateProjectOpen()}>
-                <AddIcon style={{color: darkmode.buttonAccent, marginRight: 16}}/>
-                <div style={{fontSize: 14, fontWeight: 600}}>New Project</div>
+                <AddIcon style={{ color: darkmode.buttonAccent, marginRight: 16 }} />
+                <div style={{ fontSize: 14, fontWeight: 600 }}>New Project</div>
 
               </ListItemButton>
             </ListItem>
-            
+
             {projects.map((project, index) => (
-              <ListItem key={index} disablePadding className="drawer-button" style={{marginTop: 5}}>
-                <ListItemButton 
+              <ListItem key={index} disablePadding className="drawer-button" style={{ marginTop: 5 }}>
+                <ListItemButton
                   onClick={() => setSelectedProject(project.id)}
                   style={{ backgroundColor: selectedProject === project.id ? darkmode.drawerSelect : 'transparent', justifyContent: 'space-between' }}
                 >
-                  <div style={{display: 'flex', alignItems: 'center'}}>
-                  <ArticleOutlinedIcon style={{color: darkmode.buttonAccent, marginRight: 16}}/>
-                  <div style={{fontSize: 14, fontWeight: 600, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{project.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <ArticleOutlinedIcon style={{ color: darkmode.buttonAccent, marginRight: 16 }} />
+                    <div style={{ fontSize: 14, fontWeight: 600, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{project.name}</div>
                   </div>
-                  <div style={{display: 'flex', alignItems: 'center'}}>
-                  <DeleteOutlineOutlinedIcon
-                    onClick={handleDeleteProjectOpen}
-                    className="editProjectIcon" 
-                    style={{ 
-                      paddingLeft: 12, 
-                      color: darkmode.buttonAccent, 
-                      fontSize: 18, 
-                      display: 'flex', 
-                      textAlign: 'right'
-                    }}
-                  />
-                  <EditOutlinedIcon 
-                    onClick={() => handleEditProjectOpen(project)}
-                    className="editProjectIcon" 
-                    style={{ 
-                      paddingLeft: 12, 
-                      color: darkmode.buttonAccent, 
-                      fontSize: 18, 
-                      display: 'flex', 
-                      textAlign: 'right'
-                    }}
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <DeleteOutlineOutlinedIcon
+                      onClick={handleDeleteProjectOpen}
+                      className="editProjectIcon"
+                      style={{
+                        paddingLeft: 12,
+                        color: darkmode.buttonAccent,
+                        fontSize: 18,
+                        display: 'flex',
+                        textAlign: 'right'
+                      }}
+                    />
+                    <EditOutlinedIcon
+                      onClick={() => handleEditProjectOpen(project)}
+                      className="editProjectIcon"
+                      style={{
+                        paddingLeft: 12,
+                        color: darkmode.buttonAccent,
+                        fontSize: 18,
+                        display: 'flex',
+                        textAlign: 'right'
+                      }}
+                    />
                   </div>
                 </ListItemButton>
               </ListItem>
@@ -431,7 +433,7 @@ function App() {
           <Divider />
         </Drawer>
 
-        <div 
+        <div
           style={{
             position: 'absolute',
             marginTop: 70,
@@ -439,33 +441,41 @@ function App() {
             //transition: 'margin-left 0.025s ease', // Transition for the button
           }}
         >
-           <Button
-            color="success"
-            variant="outlined"
-            onClick={handleSave}
-            style={{height: 30, marginRight: 10 }}
-          >
-            <SaveOutlinedIcon style={{marginRight: 10}}/>
-            <div>
-              Save Project
-            </div>
-            
-          </Button>
+          <Grid container spacing={2}>
+            <Grid >
+              <Button
+                color="success"
+                variant="outlined"
+                onClick={handleSave}
+                style={{ height: 30, whiteSpace: 'nowrap' }}
+              >
+                <SaveOutlinedIcon style={{ marginRight: 10 }} />
+                <div>
+                  Save Project
+                </div>
 
-          <Button
-            color="error"
-            variant="outlined"
-            onClick={clearAll}
-            style={{height: 30 }}
-          >
-            <HighlightOffIcon style={{marginRight: 10}}/>
-            <div>
-              Clear All
-            </div>
-            
-          </Button>
+              </Button>
+            </Grid>
+            <Grid >
+              <Button
+                color="error"
+                variant="outlined"
+                onClick={clearAll}
+                style={{ height: 30 }}
+              >
+                <HighlightOffIcon style={{ marginRight: 10 }} />
+                <div>
+                  Clear All
+                </div>
+
+              </Button>
+            </Grid>
+          </Grid>
+
+
+
         </div>
-        <div 
+        <div
           style={{
             position: 'absolute',
             bottom: 40,
@@ -475,12 +485,12 @@ function App() {
             //backgroundColor: 'transparent'
           }}
         >
-          <img src={wasd} style={{width: 120, height: 120}}/>
+          <img src={wasd} style={{ width: 120, height: 120 }} />
         </div>
       </div>
 
-      <Modal 
-        open={newProjectModalOpen} 
+      <Modal
+        open={newProjectModalOpen}
         onClose={() => setNewProjectModalOpen(false)}
         onMouseEnter={(event) => event.stopPropagation()}
 
@@ -514,66 +524,66 @@ function App() {
           }}
         >
           {projectModalMode !== 'delete' ?
-          <>
-          <IconButton
-            onClick={() => setNewProjectModalOpen(false)}
-            sx={{ position: "absolute", top: 8, right: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-          <h2 style={{ margin: 0 }}>{projectModalMode === 'create' ? 'New Project' : 'Edit Project'}</h2>
-          <div style={{display: 'flex', alignItems: 'center', marginTop: 10}}>
-          <TextField
-            variant="outlined"
-            placeholder="Enter project name"
-            fullWidth
-            size="small"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            //sx={{ marginTop: 1 }}
-          />
-          <Button 
-            size="small" 
-            variant="contained" 
-            color="success"
-            style={{height: 40, padding: 0, fontWeight: 600}}
-            onClick={
-              projectModalMode === 'create' ?
-                () => handleCreateSubmit({ name: projectName })
-              :
-                () => handleEditSubmit(projects.find((p) => p.id === selectedProject), { name: projectName })
-            }
-          >
-            Go
-          </Button>
-          </div>
-          </>
-          :
             <>
-             <IconButton
-              onClick={() => setNewProjectModalOpen(false)}
-              sx={{ position: "absolute", top: 8, right: 8 }}
-            >
-              <CloseIcon />
-            </IconButton>
-            <h2 style={{ margin: 0 }}>Delete Project?</h2>
-            <ButtonGroup fullWidth>
-              <Button 
-                color="warning" 
-                onClick={() => handleDeleteSubmit(projects.find((p) => p.id === selectedProject))}
-                style={{fontWeight: 560}}
-              >
-                yes
-              </Button>
-              <Button 
-                variant="contained" 
-                color="warning" 
+              <IconButton
                 onClick={() => setNewProjectModalOpen(false)}
-                style={{fontWeight: 560}}
+                sx={{ position: "absolute", top: 8, right: 8 }}
               >
-                no
-              </Button>
-            </ButtonGroup>
+                <CloseIcon />
+              </IconButton>
+              <h2 style={{ margin: 0 }}>{projectModalMode === 'create' ? 'New Project' : 'Edit Project'}</h2>
+              <div style={{ display: 'flex', alignItems: 'center', marginTop: 10 }}>
+                <TextField
+                  variant="outlined"
+                  placeholder="Enter project name"
+                  fullWidth
+                  size="small"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                //sx={{ marginTop: 1 }}
+                />
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="success"
+                  style={{ height: 40, padding: 0, fontWeight: 600 }}
+                  onClick={
+                    projectModalMode === 'create' ?
+                      () => handleCreateSubmit({ name: projectName })
+                      :
+                      () => handleEditSubmit(projects.find((p) => p.id === selectedProject), { name: projectName })
+                  }
+                >
+                  Go
+                </Button>
+              </div>
+            </>
+            :
+            <>
+              <IconButton
+                onClick={() => setNewProjectModalOpen(false)}
+                sx={{ position: "absolute", top: 8, right: 8 }}
+              >
+                <CloseIcon />
+              </IconButton>
+              <h2 style={{ margin: 0 }}>Delete Project?</h2>
+              <ButtonGroup fullWidth>
+                <Button
+                  color="warning"
+                  onClick={() => handleDeleteSubmit(projects.find((p) => p.id === selectedProject))}
+                  style={{ fontWeight: 560 }}
+                >
+                  yes
+                </Button>
+                <Button
+                  variant="contained"
+                  color="warning"
+                  onClick={() => setNewProjectModalOpen(false)}
+                  style={{ fontWeight: 560 }}
+                >
+                  no
+                </Button>
+              </ButtonGroup>
             </>
           }
 
@@ -583,7 +593,7 @@ function App() {
 
 
 
-      <div id="render-target" ref={refContainer} style={{ position: 'absolute', width: 'calc(100vw)', height: 'calc(100vh)', float: 'right', zIndex: -1}}>
+      <div id="render-target" ref={refContainer} style={{ position: 'absolute', width: 'calc(100vw)', height: 'calc(100vh)', float: 'right', zIndex: -1 }}>
       </div>
     </>
   );

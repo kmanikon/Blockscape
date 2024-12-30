@@ -22,10 +22,17 @@ export function createCamera(gameWindow) {
 
   const Y_AXIS = new THREE.Vector3(0, 1, 0);
 
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+
   // -- Variables --
   const camera = new THREE.PerspectiveCamera(45, gameWindow.offsetWidth / gameWindow.offsetHeight, 0.1, 1000);
   let cameraOrigin = new THREE.Vector3(8, 0, 8);
-  let cameraRadius = (MIN_CAMERA_RADIUS + MAX_CAMERA_RADIUS) / 2;
+
+  // Set initial camera radius based on device type
+  let cameraRadius = isMobile
+    ? MIN_CAMERA_RADIUS + (MAX_CAMERA_RADIUS - MIN_CAMERA_RADIUS) * 0.9 // Closer zoom for mobile
+    : (MIN_CAMERA_RADIUS + MAX_CAMERA_RADIUS) / 2; // Default zoom for desktop
+  //let cameraRadius = (MIN_CAMERA_RADIUS + MAX_CAMERA_RADIUS) / 2;
   let cameraAzimuth = 135;
   let cameraElevation = 45;
 
