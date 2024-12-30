@@ -19,30 +19,13 @@ export function createGame(mode, initialTerrain, setSelectedTerrain) {
 
   scene.initialize(city, initialTerrain,);
 
-  let touchStartDistance = 0;
 
+  // Hook up mouse event handlers to the scene
   document.addEventListener('mousedown', scene.onMouseDown.bind(scene), false);
-// Replace with:
-document.addEventListener('touchstart', (event) => {
-  event.preventDefault(); // Prevent default behavior (e.g., scrolling)
-  scene.onMouseDown({ 
-    clientX: event.touches[0].clientX, 
-    clientY: event.touches[0].clientY 
-  }); 
-}, false);
-
-document.addEventListener('mousemove', scene.onMouseMove.bind(scene), false);
-// Replace with:
-document.addEventListener('touchmove', (event) => {
-  event.preventDefault();
-  scene.onMouseMove({ 
-    clientX: event.touches[0].clientX, 
-    clientY: event.touches[0].clientY 
-  }); 
-}, false);
-
-document.addEventListener('wheel', scene.onMouseWheel.bind(scene), false);
-
+  document.addEventListener('mousemove', scene.onMouseMove.bind(scene), false);
+  document.addEventListener('wheel', scene.onMouseWheel.bind(scene), false);
+  document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
+  
   const game = {
     clearHighlights() {
       scene.clearHighlights();
