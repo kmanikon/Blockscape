@@ -136,12 +136,12 @@ function App() {
               // Compare the initial and current distances to determine pinch direction
               if (currentDistance < initialDistance) {
                   // User moved fingers closer together
-                  //alert('Pinch detected: scale < 1.0');
-                  scene.onMouseWheel(e)
+                  alert(`Pinch detected: scale = ${currentDistance}}`);
+                  //scene.onMouseWheel(e)
               } else if (currentDistance > initialDistance) {
                   // User moved fingers further apart
-                  //alert('Pinch detected: scale > 1.0');
-                  scene.onMouseWheel(e)
+                  alert(`Pinch detected: scale = ${currentDistance}}`);
+                  //scene.onMouseWheel(e)
               }
           }
       }, false);
