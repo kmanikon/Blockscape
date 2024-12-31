@@ -505,6 +505,10 @@ function highlightAdjacentFaces(x, y, z) {
     camera.onMouseWheel(event);
   }
 
+  function onMouseWheelDelta(event, delta) {
+    camera.onMouseWheelDelta(event, delta);
+  }
+
   function onMouseMove(event) {
     camera.onMouseMove(event);
   
@@ -565,6 +569,7 @@ function highlightAdjacentFaces(x, y, z) {
     onMouseDown,
     onMouseWheel,
     onMouseMove,
+    onMouseWheelDelta,
     clearHighlights
   }
 }

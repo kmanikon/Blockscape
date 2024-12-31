@@ -99,7 +99,7 @@ function App() {
     } else if (scale < 1) {
       //alert("Pinch zoom out detected");
     }
-    s.onMouseWheel.bind(s)
+    s.onMouseWheelDelta(s, scale);
   };
 
   const bind = useGesture({
