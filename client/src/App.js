@@ -309,7 +309,7 @@ function App() {
               aria-label="open drawer"
               onClick={handleLeftDrawerToggle}
               edge="start"
-              sx={{ marginRight: 2 }}
+              sx={{ marginRight: 2, pointerEvents: 'auto' }}
             >
               <MenuIcon />
               {leftDrawerOpen ?
@@ -333,9 +333,10 @@ function App() {
               onClick={handleRightDrawerToggle}
               edge="start"
               sx={{ marginRight: 1 }}
-              style={{ textTransform: 'none', backgroundColor: 'transparent' }}
+              style={{ textTransform: 'none', backgroundColor: 'transparent', pointerEvents: 'auto' }}
             >
               <FormatListBulletedIcon />
+              
               {/*}
               <Typography variant="h6" noWrap style={{ fontWeight: 560, marginLeft: 15, fontSize: 17 }}>
                 Projects
