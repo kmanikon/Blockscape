@@ -154,7 +154,7 @@ export function createCamera(gameWindow) {
 
     // Scroll event handler for zooming
     function onMouseWheelDelta(event, delta) {
-      alert(delta);
+      //alert(delta);
       //const delta = event.deltaY || event.detail || -event.wheelDelta;
       cameraRadius += delta * ZOOM_SENSITIVITY;
   
