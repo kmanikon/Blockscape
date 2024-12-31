@@ -83,8 +83,17 @@
   display: block;
 }
 
+.navContainer {
+  right: 40px;
+}
+
 @media (max-width: 898px) {
   .wasdImg {
     display: none;
+  }
+
+  .navContainer {
+    right: 0px;
+    justify-content: center;
   }
 }

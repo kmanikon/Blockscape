@@ -577,12 +577,13 @@ function App() {
           style={{
             position: 'absolute',
             bottom: 60,
-            right: 40,
+            //right: 40,
             marginTop: 70,
             marginRight: rightDrawerOpen ? 210 : 30,
             //transition: 'margin-left 0.175s ease', // Transition for the button
             //backgroundColor: 'transparent'
           }}
+          className="navContainer"
         >
           <div style={{display: 'flex', alignItems: 'center'}}>
           <Grid container spacing={2} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
