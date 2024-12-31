@@ -35,9 +35,16 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import RotateLeftIcon from '@mui/icons-material/RotateLeft';
+import RotateRightIcon from '@mui/icons-material/RotateRight';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getProjects, getProjectById, createProject, editProject, deleteProject, saveProjectTerrain } from './api/supabase.js';
-import { useGesture } from "@use-gesture/react";
-
+import HoldButton from './components/HoldButton';
 import wasd from './assets/wasd.png';
 
 import './App.css';
@@ -92,19 +99,6 @@ function App() {
     fetchProjects();
 
   }, []);
-
-  const handlePinch = ({ offset: [scale] }) => {
-    if (scale > 1) {
-      //alert("Pinch zoom in detected");
-    } else if (scale < 1) {
-      //alert("Pinch zoom out detected");
-    }
-    s.onMouseWheelDelta(s, scale);
-  };
-
-  const bind = useGesture({
-    onPinch: handlePinch,
-  });
 
   useEffect(() => {
     const fetchTerrain = async () => {
@@ -206,6 +200,77 @@ function App() {
     // clear scene
     handleClearAll();
   }
+
+  const DirectionArrows = () => (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateRows: '1fr auto 1fr',
+        gridTemplateColumns: '1fr auto 1fr',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '0px', // Adjust spacing between the arrows
+        textAlign: 'center',
+      }}
+    >
+      {/* Left Arrow */}
+      <div style={{ gridRow: '2', gridColumn: '1' }}>
+        <HoldButton action={() => s.shiftCamera(s, -0.5, 0)}>
+          <Button
+            variant="text"
+            disableRipple
+            size="small"
+            style={{ color: '#777777', background: 'transparent', padding: 0 , marginRight: -45 }}
+          >
+            <ArrowBackIcon style={{ fontSize: 22, padding: 0}} />
+          </Button>
+        </HoldButton>
+      </div>
+  
+      {/* Up Arrow */}
+      <div style={{ gridRow: '1', gridColumn: '2' }}>
+        <HoldButton action={() => s.shiftCamera(s, 0, 0.5)}>
+          <Button
+            variant="text"
+            disableRipple
+            size="small"
+            style={{ color: '#777777', background: 'transparent', padding: 0, marginBottom: -5}}
+          >
+            <ArrowUpwardIcon style={{ fontSize: 22 }} />
+          </Button>
+        </HoldButton>
+      </div>
+  
+      {/* Down Arrow */}
+      <div style={{ gridRow: '3', gridColumn: '2' }}>
+        <HoldButton action={() => s.shiftCamera(s, 0, -0.5)}>
+          <Button
+            variant="text"
+            disableRipple
+            size="small"
+            style={{ color: '#777777', background: 'transparent', padding: 0, marginTop: -5}}
+          >
+            <ArrowDownwardIcon style={{ fontSize: 22 }} />
+          </Button>
+        </HoldButton>
+      </div>
+  
+      {/* Right Arrow */}
+      <div style={{ gridRow: '2', gridColumn: '3' }}>
+        <HoldButton action={() => s.shiftCamera(s, 0.5, 0)}>
+          <Button
+            variant="text"
+            disableRipple
+            size="small"
+            style={{ color: '#777777', background: 'transparent', padding: 0, marginLeft: -45 }}
+          >
+            <ArrowForwardIcon style={{ fontSize: 22, padding: 0 }} />
+          </Button>
+        </HoldButton>
+      </div>
+    </div>
+  );
+  
 
   return (
     <>
@@ -493,17 +558,116 @@ function App() {
 
 
         </div>
+        
         <div
           style={{
             position: 'absolute',
             bottom: 40,
             marginTop: 70,
-            marginLeft: leftDrawerOpen ? 200 : 20,
+            marginLeft: leftDrawerOpen ? 200 : 40,
             //transition: 'margin-left 0.175s ease', // Transition for the button
             //backgroundColor: 'transparent'
           }}
         >
-          <img src={wasd} style={{ width: 120, height: 120 }} />
+          <img src={wasd} className="wasdImg" style={{ width: 120, height: 120 }} />
+        </div>
+        
+
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 60,
+            right: 40,
+            marginTop: 70,
+            marginRight: rightDrawerOpen ? 210 : 30,
+            //transition: 'margin-left 0.175s ease', // Transition for the button
+            //backgroundColor: 'transparent'
+          }}
+        >
+          <div style={{display: 'flex', alignItems: 'center'}}>
+          <Grid container spacing={2} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <Grid >
+              <HoldButton
+                action={() => s.onMouseWheelDelta(s, -10)}
+              >
+                <Button
+                  //color="primary"
+                  variant="text"
+                  disableRipple
+                  //onPress={() => s.onMouseWheelDelta(s, 0.9)}
+                  style={{  color: '#777777', background: 'transparent', padding: 0, minWidth: 40 }}
+                >
+                  <ZoomInIcon style={{ fontSize: 26 }} />
+                </Button>
+              </HoldButton>
+            </Grid>
+
+            <Grid >
+              <HoldButton
+                action={() => s.onMouseWheelDelta(s, 10)}
+              >
+                <Button
+                  //color="primary"
+                  variant="text"
+                  disableRipple
+                  disablePadding
+                  size="small"
+                  //onPress={() => s.onMouseWheelDelta(s, 0.9)}
+                  style={{ color: '#777777', background: 'transparent', padding: 0, minWidth: 40 }}
+                >
+                  <ZoomOutIcon style={{ fontSize: 26 }} />
+                 
+
+                </Button>
+              </HoldButton>
+            </Grid>
+
+            <Grid>
+              <HoldButton
+                action={() => s.rotateCameraHorizontally(s, -5)}
+              >
+                <Button
+                  //color="primary"
+                  variant="text"
+                  disableRipple
+                  disablePadding
+                  //onPress={() => s.onMouseWheelDelta(s, 0.9)}
+                  style={{ color: '#777777', background: 'transparent', padding: 0, minWidth: 40}}
+                >
+                  <RotateLeftIcon style={{ fontSize: 26 }} />
+                 
+
+                </Button>
+              </HoldButton>
+              </Grid>
+
+              <Grid>
+              <HoldButton
+                action={() => s.rotateCameraHorizontally(s, 5)}
+              >
+                <Button
+                  //color="primary"
+                  variant="text"
+                  disableRipple
+                  //onPress={() => s.onMouseWheelDelta(s, 0.9)}
+                  style={{ color: '#777777', background: 'transparent', padding: 0, minWidth: 40 }}
+                >
+                  <RotateRightIcon style={{ fontSize: 26 }} />
+                 
+
+                </Button>
+              </HoldButton>
+              </Grid>
+
+
+              <Grid>
+
+              <DirectionArrows/>
+              </Grid>
+            </Grid>
+
+
+              </div>
         </div>
       </div>
 
@@ -611,7 +775,7 @@ function App() {
 
 
 
-      <div id="render-target" {...bind()} ref={refContainer} style={{ position: 'absolute', width: 'calc(100vw)', height: 'calc(100vh)', float: 'right', zIndex: -1 }}>
+      <div id="render-target" ref={refContainer} style={{ position: 'absolute', width: 'calc(100vw)', height: 'calc(100vh)', float: 'right', zIndex: -1 }}>
       </div>
     </>
   );

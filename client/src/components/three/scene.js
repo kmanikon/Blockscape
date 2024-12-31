@@ -501,12 +501,19 @@ function highlightAdjacentFaces(x, y, z) {
 
   // Scroll event listener for zooming in and out
   function onMouseWheel(event) {
-    
     camera.onMouseWheel(event);
   }
 
   function onMouseWheelDelta(event, delta) {
     camera.onMouseWheelDelta(event, delta);
+  }
+
+  function rotateCameraHorizontally(event, delta) {
+    camera.rotateCameraHorizontally(event, delta);
+  }
+
+  function shiftCamera(event, xDiff, yDiff) { 
+    camera.shiftCamera(event, xDiff, yDiff);
   }
 
   function onMouseMove(event) {
@@ -570,6 +577,8 @@ function highlightAdjacentFaces(x, y, z) {
     onMouseWheel,
     onMouseMove,
     onMouseWheelDelta,
+    rotateCameraHorizontally,
+    shiftCamera,
     clearHighlights
   }
 }

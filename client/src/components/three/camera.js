@@ -152,17 +152,32 @@ export function createCamera(gameWindow) {
     updateCameraPosition();
   }
 
-    // Scroll event handler for zooming
-    function onMouseWheelDelta(event, delta) {
-      //alert(delta);
-      //const delta = event.deltaY || event.detail || -event.wheelDelta;
-      cameraRadius += delta * ZOOM_SENSITIVITY;
+  // Scroll event handler for zooming
+  function onMouseWheelDelta(event, delta) {
+    //alert(delta);
+    //const delta = event.deltaY || event.detail || -event.wheelDelta;
+    cameraRadius += delta * ZOOM_SENSITIVITY;
+
+    // Clamping zoom limits
+    cameraRadius = Math.min(MAX_CAMERA_RADIUS, Math.max(MIN_CAMERA_RADIUS, cameraRadius));
+
+    updateCameraPosition();
+  }
+
+  function rotateCameraHorizontally(event, angleDelta) {
+    cameraAzimuth += angleDelta;
+    updateCameraPosition();
+  }
+
+  function shiftCamera(event, xDiff, yDiff) {
+    const forward = new THREE.Vector3(0, 0, 1).applyAxisAngle(Y_AXIS, cameraAzimuth * DEG2RAD);
+    const left = new THREE.Vector3(1, 0, 0).applyAxisAngle(Y_AXIS, cameraAzimuth * DEG2RAD);
   
-      // Clamping zoom limits
-      cameraRadius = Math.min(MAX_CAMERA_RADIUS, Math.max(MIN_CAMERA_RADIUS, cameraRadius));
+    cameraOrigin.add(forward.multiplyScalar(-yDiff)); // Negative because yDiff is forward/backward
+    cameraOrigin.add(left.multiplyScalar(xDiff)); // Positive because xDiff is left/right
   
-      updateCameraPosition();
-    }
+    updateCameraPosition();
+  }
 
   function updateCameraPosition() {
     camera.position.x = cameraRadius * Math.sin(cameraAzimuth * DEG2RAD) * Math.cos(cameraElevation * DEG2RAD);
@@ -189,6 +204,8 @@ export function createCamera(gameWindow) {
     camera,
     onMouseMove,
     onMouseWheelDelta,
+    rotateCameraHorizontally,
+    shiftCamera,
     onMouseWheel
   };
 }

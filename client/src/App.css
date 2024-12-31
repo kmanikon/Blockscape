@@ -78,3 +78,13 @@
 .editProjectIcon:hover {
   color: white !important;
 }
+
+.wasdImg {
+  display: block;
+}
+
+@media (max-width: 898px) {
+  .wasdImg {
+    display: none;
+  }
+}
