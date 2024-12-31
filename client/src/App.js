@@ -61,6 +61,8 @@ const darkmode = {
   buttonAccent: 'rgba(240, 244, 248, 0.6)'
 }
 
+let s;
+
 function App() {
   const refContainer = useRef(null);
   const theme = useTheme();
@@ -93,10 +95,11 @@ function App() {
 
   const handlePinch = ({ offset: [scale] }) => {
     if (scale > 1) {
-      alert("Pinch zoom in detected");
+      //alert("Pinch zoom in detected");
     } else if (scale < 1) {
-      alert("Pinch zoom out detected");
+      //alert("Pinch zoom out detected");
     }
+    s.onMouseWheel.bind(s)
   };
 
   const bind = useGesture({
@@ -104,7 +107,6 @@ function App() {
   });
 
   useEffect(() => {
-    let s;
     const fetchTerrain = async () => {
       const data = await getProjectById(selectedProject);
       //sessionStorage.setItem('terrain', data);
