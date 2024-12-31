@@ -36,6 +36,7 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import { getProjects, getProjectById, createProject, editProject, deleteProject, saveProjectTerrain } from './api/supabase.js';
+import { useGesture } from "@use-gesture/react";
 
 import wasd from './assets/wasd.png';
 
@@ -90,6 +91,18 @@ function App() {
 
   }, []);
 
+  const handlePinch = ({ offset: [scale] }) => {
+    if (scale > 1) {
+      alert("Pinch zoom in detected");
+    } else if (scale < 1) {
+      alert("Pinch zoom out detected");
+    }
+  };
+
+  const bind = useGesture({
+    onPinch: handlePinch,
+  });
+
   useEffect(() => {
     let s;
     const fetchTerrain = async () => {
@@ -109,7 +122,7 @@ function App() {
       document.addEventListener('mousedown', scene.onMouseDown.bind(scene), false);
       document.addEventListener('mousemove', scene.onMouseMove.bind(scene), false);
       document.addEventListener('wheel', scene.onMouseWheel.bind(scene), {passive: false});
-      document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
+      document.addEventListener('contextmenu', (event) => event.preventDefault(), false);    
     }
     
     if (selectedProject !== -1) {
@@ -596,7 +609,7 @@ function App() {
 
 
 
-      <div id="render-target" ref={refContainer} style={{ position: 'absolute', width: 'calc(100vw)', height: 'calc(100vh)', float: 'right', zIndex: -1 }}>
+      <div id="render-target" {...bind()} ref={refContainer} style={{ position: 'absolute', width: 'calc(100vw)', height: 'calc(100vh)', float: 'right', zIndex: -1 }}>
       </div>
     </>
   );
