@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/Blockscape/static/css/main.b003e616.css",
+    "main.js": "/Blockscape/static/js/main.2cec8b87.js",
+    "static/js/952.441ded96.chunk.js": "/Blockscape/static/js/952.441ded96.chunk.js",
+    "static/media/wasd.png": "/Blockscape/static/media/wasd.bdc3129ed8d9ab636b71.png",
+    "index.html": "/Blockscape/index.html",
+    "main.b003e616.css.map": "/Blockscape/static/css/main.b003e616.css.map",
+    "main.2cec8b87.js.map": "/Blockscape/static/js/main.2cec8b87.js.map",
+    "952.441ded96.chunk.js.map": "/Blockscape/static/js/952.441ded96.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b003e616.css",
+    "static/js/main.2cec8b87.js"
+  ]
+}
