@@ -351,7 +351,7 @@ function App() {
                   disabled={supabaseError}
                   style={{color: supabaseError ? 'grey' : ''}}
                 >
-                  <SaveOutlinedIcon style={{ marginRight: isMobile ? 10 : 0 }} />
+                  <SaveOutlinedIcon style={{ marginRight: isMobile ? 0 : 10 }} />
                   <div>
                     {isMobile ? '' : 'Save' }
                   </div>
