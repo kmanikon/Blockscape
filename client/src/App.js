@@ -324,7 +324,7 @@ function App() {
               aria-label="open drawer"
               onClick={handleLeftDrawerToggle}
               edge="start"
-              sx={{ marginRight: 2, pointerEvents: 'auto' }}
+              sx={{ marginRight: isMobile ? 0 : 2, pointerEvents: 'auto' }}
             >
               <MenuIcon />
               {leftDrawerOpen ?
@@ -351,9 +351,9 @@ function App() {
                   disabled={supabaseError}
                   style={{color: supabaseError ? 'grey' : ''}}
                 >
-                  <SaveOutlinedIcon style={{ marginRight: 10 }} />
+                  <SaveOutlinedIcon style={{ marginRight: isMobile ? 10 : 0 }} />
                   <div>
-                    Save
+                    {isMobile ? '' : 'Save' }
                   </div>
 
                 </Button>
