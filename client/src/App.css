@@ -87,6 +87,17 @@
   right: 40px;
 }
 
+#save-button {
+  height: 30px;
+  background-color: #272625ff;
+  white-space: nowrap;
+}
+
+#clear-button {
+  height: 30px;
+  background-color: #272625ff;
+}
+
 @media (max-width: 898px) {
   .wasdImg {
     display: none;
@@ -95,5 +106,9 @@
   .navContainer {
     right: 0px;
     justify-content: center;
+  }
+
+  #clear-button {
+    display: none;
   }
 }

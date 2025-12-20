@@ -92,7 +92,7 @@ function App() {
     const fetchProjects = async () => {
       const projectData = await getProjects();
       setProjects(projectData);
-      if (projectData.length > 0) {
+      if (projectData?.length > 0) {
         setSelectedProject(projectData[0].id)
       }
     }
@@ -177,7 +177,7 @@ function App() {
   const handleEditSubmit = async (oldProject, newProject) => {
     const data = await editProject(oldProject, newProject);
     if (data) {
-      setProjects(projects.map((p) => p.id === selectedProject ? { id: p.id, name: newProject.name } : p))
+      setProjects(projects?.map((p) => p.id === selectedProject ? { id: p.id, name: newProject.name } : p))
     }
     setNewProjectModalOpen(false);
   }
@@ -327,6 +327,33 @@ function App() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{display: 'flex', gap: 10, padding: 5}}>
+                <Button
+                  id="save-button"
+                  color="success"
+                  variant="outlined"
+                  onClick={handleSave}
+                >
+                  <SaveOutlinedIcon style={{ marginRight: 10 }} />
+                  <div>
+                    Save
+                  </div>
+
+                </Button>
+                <Button
+                  id="clear-button"
+                  color="error"
+                  variant="outlined"
+                  onClick={clearAll}
+                >
+                  <HighlightOffIcon style={{ marginRight: 10 }} />
+                  <div>
+                    Clear All
+                  </div>
+
+                </Button>
+              </div>
+
             <Button
               color="inherit"
               aria-label="open drawer"
@@ -407,7 +434,7 @@ function App() {
                 <div style={{ fontSize: 15, fontWeight: 600 }}>Clear</div>
               </ListItemButton>
             </ListItem>
-            {colorPalette.map((color, index) => (
+            {colorPalette?.map((color, index) => (
               <ListItem key={index} disablePadding className="drawer-button">
                 <ListItemButton onClick={() => swapTool('player_block', color)} style={{ backgroundColor: selectedColor === color ? darkmode.drawerSelect : 'transparent' }}>
                   <ListItemIcon>
@@ -476,7 +503,7 @@ function App() {
               </ListItemButton>
             </ListItem>
 
-            {projects.map((project, index) => (
+            {projects?.map((project, index) => (
               <ListItem key={index} disablePadding className="drawer-button" style={{ marginTop: 5 }}>
                 <ListItemButton
                   onClick={() => setSelectedProject(project.id)}
@@ -525,36 +552,7 @@ function App() {
             //transition: 'margin-left 0.025s ease', // Transition for the button
           }}
         >
-          <Grid container spacing={2}>
-            <Grid >
-              <Button
-                color="success"
-                variant="outlined"
-                onClick={handleSave}
-                style={{ height: 30, whiteSpace: 'nowrap' }}
-              >
-                <SaveOutlinedIcon style={{ marginRight: 10 }} />
-                <div>
-                  Save Project
-                </div>
-
-              </Button>
-            </Grid>
-            <Grid >
-              <Button
-                color="error"
-                variant="outlined"
-                onClick={clearAll}
-                style={{ height: 30 }}
-              >
-                <HighlightOffIcon style={{ marginRight: 10 }} />
-                <div>
-                  Clear All
-                </div>
-
-              </Button>
-            </Grid>
-          </Grid>
+          
 
 
 
@@ -612,7 +610,6 @@ function App() {
                   //color="primary"
                   variant="text"
                   disableRipple
-                  disablePadding
                   size="small"
                   //onPress={() => s.onMouseWheelDelta(s, 0.9)}
                   style={{ color: '#777777', background: 'transparent', padding: 0, minWidth: 40 }}
@@ -632,7 +629,6 @@ function App() {
                   //color="primary"
                   variant="text"
                   disableRipple
-                  disablePadding
                   //onPress={() => s.onMouseWheelDelta(s, 0.9)}
                   style={{ color: '#777777', background: 'transparent', padding: 0, minWidth: 40}}
                 >
