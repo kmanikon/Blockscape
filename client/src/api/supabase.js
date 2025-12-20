@@ -14,10 +14,10 @@ const getProjects = async () => {
 const getProjectById = async (id) => {
     try {
         const { data } = await supabaseClient.from("terrain_entries").select(`terrain_string`).eq('id', id);
-        if (data.length === 0) {
+        if (data?.length === 0) {
             return '';
         }
-        return data[0].terrain_string;
+        return data?.[0].terrain_string;
     } catch (e) {
         console.log(e);
         return '';
