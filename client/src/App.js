@@ -342,7 +342,7 @@ function App() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{display: 'flex', gap: 10, padding: 5}}>
+              <div id="button-container">
                 <Button
                   id="save-button"
                   color="success"

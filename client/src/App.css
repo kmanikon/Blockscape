@@ -87,6 +87,12 @@
   right: 40px;
 }
 
+#button-container {
+  display: flex;
+  gap: 10px;
+  padding: 5px;
+}
+
 #save-button {
   height: 30px;
   background-color: #272625ff;
@@ -110,5 +116,14 @@
 
   #clear-button {
     display: none;
+  }
+
+  #save-button {
+    padding: 10px;
+  }
+
+  #button-container {
+    gap: 0px;
+    padding: 0px;
   }
 }
