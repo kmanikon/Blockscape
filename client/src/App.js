@@ -83,14 +83,43 @@ function App() {
   const [selectedProject, setSelectedProject] = useState(-1);
   const [selectedTerrain, setSelectedTerrain] = useState();
 
+  const [supabaseError, setSupabaseError] = useState(false);
+
   const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
 
   const [projectModalMode, setProjectModalMode] = useState('create');
   const drawerWidth = 240;
 
+  const fetchTerrain = async () => {
+    const data = await getProjectById(selectedProject);
+    //sessionStorage.setItem('terrain', data);
+    setSelectedTerrain(data);
+    if (refContainer.current) {
+      while (refContainer.current.firstChild) {
+        refContainer.current.removeChild(refContainer.current.firstChild);
+      }
+    }
+    let { game, scene } = createGame('dark', data, setSelectedTerrain);
+    window.game = game;
+    s = scene;
+
+    // Hook up mouse event handlers to the scene
+    document.addEventListener('mousedown', scene.onMouseDown.bind(scene), false);
+    document.addEventListener('mousemove', scene.onMouseMove.bind(scene), false);
+    document.addEventListener('wheel', scene.onMouseWheel.bind(scene), {passive: false});
+    document.addEventListener('contextmenu', (event) => event.preventDefault(), false);    
+  }
+
   useEffect(() => {
     const fetchProjects = async () => {
       const projectData = await getProjects();
+      if (projectData == null) {
+        setSupabaseError(true)
+
+        // start offline mode
+        fetchTerrain()
+       
+      }
       setProjects(projectData);
       if (projectData?.length > 0) {
         setSelectedProject(projectData[0].id)
@@ -101,25 +130,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const fetchTerrain = async () => {
-      const data = await getProjectById(selectedProject);
-      //sessionStorage.setItem('terrain', data);
-      setSelectedTerrain(data);
-      if (refContainer.current) {
-        while (refContainer.current.firstChild) {
-          refContainer.current.removeChild(refContainer.current.firstChild);
-        }
-      }
-      let { game, scene } = createGame('dark', data, setSelectedTerrain);
-      window.game = game;
-      s = scene;
-
-      // Hook up mouse event handlers to the scene
-      document.addEventListener('mousedown', scene.onMouseDown.bind(scene), false);
-      document.addEventListener('mousemove', scene.onMouseMove.bind(scene), false);
-      document.addEventListener('wheel', scene.onMouseWheel.bind(scene), {passive: false});
-      document.addEventListener('contextmenu', (event) => event.preventDefault(), false);    
-    }
     
     if (selectedProject !== -1) {
       fetchTerrain();
@@ -186,6 +196,11 @@ function App() {
     const data = await deleteProject(project);
     if (data) {
       setProjects(projects.filter((p) => p.id !== selectedProject));
+
+      if (project?.id == selectedProject) {
+        setSelectedProject(projects?.[0]?.id)
+        console.log(projects?.[0])
+      }
     }
     setNewProjectModalOpen(false);
   }
@@ -333,6 +348,8 @@ function App() {
                   color="success"
                   variant="outlined"
                   onClick={handleSave}
+                  disabled={supabaseError}
+                  style={{color: supabaseError ? 'grey' : ''}}
                 >
                   <SaveOutlinedIcon style={{ marginRight: 10 }} />
                   <div>
@@ -345,6 +362,8 @@ function App() {
                   color="error"
                   variant="outlined"
                   onClick={clearAll}
+                  disabled={supabaseError}
+                  style={{color: supabaseError ? 'grey' : ''}}
                 >
                   <HighlightOffIcon style={{ marginRight: 10 }} />
                   <div>
@@ -360,7 +379,8 @@ function App() {
               onClick={handleRightDrawerToggle}
               edge="start"
               sx={{ marginRight: 1 }}
-              style={{ textTransform: 'none', backgroundColor: 'transparent', pointerEvents: 'auto' }}
+              style={{ textTransform: 'none', backgroundColor: 'transparent', pointerEvents: 'auto', color: supabaseError ? 'grey' : '', }}
+              disabled={supabaseError}
             >
               <FormatListBulletedIcon />
               
@@ -474,7 +494,7 @@ function App() {
             },
           }}
           variant="persistent"
-          open={rightDrawerOpen}
+          open={!supabaseError && rightDrawerOpen}
 
           onMouseDown={(event) => {
             event.stopPropagation();
